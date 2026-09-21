@@ -7,6 +7,7 @@ const paths: Record<IconName, React.ReactNode> = {
   garage: <><path d="m3 9 9-6 9 6v11H3ZM7 20V10h10v10M7 14h10M7 17h10"/></>,
   arena: <><path d="M5 4h14v5a7 7 0 0 1-14 0ZM5 6H2v3a4 4 0 0 0 4 4M19 6h3v3a4 4 0 0 1-4 4M12 16v5M8 21h8"/></>,
   crew: <><circle cx="12" cy="7" r="3"/><path d="M6 21v-3a6 6 0 0 1 12 0v3M5 5a3 3 0 0 0 0 6M19 5a3 3 0 0 1 0 6M2 19v-2a4 4 0 0 1 3-4M22 19v-2a4 4 0 0 0-3-4"/></>,
+  joinAIRS: <><circle cx="12" cy="12" r="8"/><path d="M12 7v10M7 12h10"/><path d="M9 15l3 3 3-3"/></>,
   arrow: <path d="M5 12h14m-6-6 6 6-6 6"/>,
   close: <path d="m6 6 12 12M18 6 6 18"/>,
   sound: <><path d="m11 4-6 5H2v6h3l6 5ZM15 8a6 6 0 0 1 0 8M18 4a11 11 0 0 1 0 16"/></>,
@@ -21,6 +22,9 @@ const paths: Record<IconName, React.ReactNode> = {
 };
 
 export function Icon({ name, size = 20 }: { name: IconName; size?: number }) {
+  console.log('Icon', name, size);
+  const path = paths[name];
+  console.log('path', path);
   return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{paths[name]}</svg>;
 }
 

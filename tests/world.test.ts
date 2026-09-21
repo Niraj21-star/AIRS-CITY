@@ -11,7 +11,7 @@ const saved = (data: unknown) => readProgress({ getItem: () => JSON.stringify(da
 const viewports = [[390, 844], [768, 1024], [1366, 768], [1440, 900], [1920, 1080]];
 
 test('canonical city, district, and mission routes round-trip through hashes', () => {
-  assert.deepEqual(districtIds, ['hq', 'research', 'garage', 'arena', 'crew']);
+  assert.deepEqual(districtIds, ['hq', 'research', 'garage', 'arena', 'crew', 'joinAIRS']);
   const routes: Route[] = [{ level: 'CITY', district: null }];
   for (const district of districtIds) {
     routes.push({ level: 'DISTRICT', district }, { level: 'CONTENT', district });

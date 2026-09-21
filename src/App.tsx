@@ -121,7 +121,7 @@ export function App() {
         else if (state.level === 'DISTRICT') travel('city');
       }
       if (!state.introComplete || state.isTransitioning || modal || state.level !== 'CITY') return;
-      if (/^[1-5]$/.test(event.key)) { event.preventDefault(); dispatch({ type: 'SELECT', id: districts[Number(event.key) - 1].id }); }
+      if (/^[1-6]$/.test(event.key)) { event.preventDefault(); dispatch({ type: 'SELECT', id: districts[Number(event.key) - 1].id }); }
       if (event.key === 'Enter' && !(event.target as HTMLElement).closest('button,a')) travel(state.selected);
     };
     window.addEventListener('keydown', onKey);
@@ -140,7 +140,7 @@ export function App() {
         <CityMap state={state} dispatch={dispatch} reduced={reduced} travel={travel} onReady={() => setAssetReady(true)}/>
         {district && <div key={district.id} className={`district-layer ${state.isTransitioning ? 'departing' : ''}`} inert={state.isTransitioning}><DistrictScene id={district.id} begin={() => dispatch({ type: 'OPEN_CONTENT' })} returnToCity={() => travel('city')} reduced={reduced} originComplete={state.originComplete} discovered={state.discovered}/></div>}
       </main>
-      <footer className="world-footer"><div className="discovery-counter"><span className="discovery-bars">{districts.map(d => <i key={d.id} className={state.discovered.includes(d.id) ? 'filled' : ''}/>)}</span><span><strong>{String(state.discovered.length).padStart(2, '0')}</strong> / 05 <span className="discovered-word">DISTRICTS DISCOVERED</span></span></div><span className="map-instructions">{state.level === 'CITY' ? 'DRAG TO EXPLORE' : 'FOLLOW YOUR CURIOSITY'}<span>+</span>{state.level === 'CITY' ? 'SELECT A WAYPOINT' : 'ESC TO RETURN'}</span><button className="index-button" id="district-index" onClick={() => setOverlay('index')} disabled={state.isTransitioning}><Icon name="map" size={16}/>District index<span className="key-hint">05</span></button></footer>
+      <footer className="world-footer"><div className="discovery-counter"><span className="discovery-bars">{districts.map(d => <i key={d.id} className={state.discovered.includes(d.id) ? 'filled' : ''}/>)}</span><span><strong>{String(state.discovered.length).padStart(2, '0')}</strong> / {String(districts.length).padStart(2, '0')} <span className="discovered-word">DISTRICTS DISCOVERED</span></span></div><span className="map-instructions">{state.level === 'CITY' ? 'DRAG TO EXPLORE' : 'FOLLOW YOUR CURIOSITY'}<span>+</span>{state.level === 'CITY' ? 'SELECT A WAYPOINT' : 'ESC TO RETURN'}</span><button className="index-button" id="district-index" onClick={() => setOverlay('index')} disabled={state.isTransitioning}><Icon name="map" size={16}/>District index<span className="key-hint">{String(districts.length).padStart(2, '0')}</span></button></footer>
       <button className="reference-badge" onClick={() => setOverlay('guide')}>Concept build <span>/ Reference scenery</span><span className="reference-dot"/></button>
     </div>
     {state.isTransitioning && <div className="travel-overlay" aria-live="polite">
@@ -162,7 +162,7 @@ export function App() {
     {state.level === 'CONTENT' && !state.isTransitioning && <MissionPanel key={state.district} state={state} dispatch={dispatch} close={() => dispatch({ type: 'CLOSE_CONTENT' })} returnToCity={() => travel('city')} reduced={reduced} persistentStorage={persistentStorage}/>} 
     {overlay && <WorldOverlay kind={overlay} close={() => setOverlay(null)} travel={travel} discovered={state.discovered}/>}
     {!state.introComplete && <Boot ready={assetReady} reduced={reduced} dispatch={dispatch}/>}
-    <div className="sr-only" role="status" aria-live="polite">{state.isTransitioning ? 'Traveling' : state.level === 'CITY' ? `City map. ${state.discovered.length} of 5 districts discovered.` : `${district?.name}. ${district?.objective}`}</div>
+    <div className="sr-only" role="status" aria-live="polite">{state.isTransitioning ? 'Traveling' : state.level === 'CITY' ? `City map. ${state.discovered.length} of ${districts.length} districts discovered.` : `${district?.name}. ${district?.objective}`}</div>
     {notice && <div className="system-notice" role="status"><span>{notice}</span><button aria-label="Dismiss notice" onClick={() => setNotice('')}><Icon name="close" size={15}/></button></div>}
   </div>;
 }

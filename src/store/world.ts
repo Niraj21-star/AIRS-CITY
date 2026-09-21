@@ -1,6 +1,6 @@
 import type { DistrictId, Point } from '../data/districts.ts';
 
-export const districtIds: DistrictId[] = ['hq', 'research', 'garage', 'arena', 'crew'];
+export const districtIds: DistrictId[] = ['hq', 'research', 'garage', 'arena', 'crew', 'joinAIRS'];
 export type Route = { level: 'CITY' | 'DISTRICT' | 'CONTENT'; district: DistrictId | null };
 export type WorldState = Route & {
   selected: DistrictId;

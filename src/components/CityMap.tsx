@@ -168,6 +168,6 @@ export function CityMap({ state, dispatch, reduced, travel, onReady }: Props) {
       </div>
       <button className="text-action" onClick={() => travel(active.id)}>Enter district <span className="key-hint">ENTER</span><Icon name="arrow" size={19}/></button>
     </aside>
-    <nav className="mobile-districts" aria-label="Select a district">{districts.map(d => <button key={d.id} aria-label={`Select ${d.name}`} aria-pressed={state.selected === d.id} className={state.selected === d.id ? 'active' : ''} style={{ '--accent': d.accent } as CSSProperties} onClick={() => focusWaypoint(d.id)}><Icon name={d.id}/><span>{d.id === 'research' ? 'Research' : d.id === 'garage' ? 'Garage' : d.id === 'arena' ? 'Arena' : d.id === 'crew' ? 'Crew' : 'HQ'}</span></button>)}</nav>
+    <nav className="mobile-districts" aria-label="Select a district">{districts.map(d => <button key={d.id} aria-label={`Select ${d.name}`} aria-pressed={state.selected === d.id} className={state.selected === d.id ? 'active' : ''} style={{ '--accent': d.accent } as CSSProperties} onClick={() => focusWaypoint(d.id)}><Icon name={d.id}/><span>{d.id === 'research' ? 'Research' : d.id === 'garage' ? 'Garage' : d.id === 'arena' ? 'Arena' : d.id === 'crew' ? 'Crew' : d.id === 'joinAIRS' ? 'Join' : 'HQ'}</span></button>)}</nav>
   </section>;
 }

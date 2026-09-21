@@ -1,4 +1,4 @@
-export type DistrictId = 'hq' | 'research' | 'garage' | 'arena' | 'crew';
+export type DistrictId = 'hq' | 'research' | 'garage' | 'arena' | 'crew' | 'joinAIRS';
 export type Point = { x: number; y: number };
 export type District = {
   id: DistrictId;
@@ -22,6 +22,7 @@ export const districts: District[] = [
   { id: 'garage', name: 'Project Garage', sector: 'PG-03', number: '03', accent: '#e89b70', position: { x: .28, y: .49 }, category: 'Less talk. More build.', description: 'Where unfinished ideas become working things. Get your hands on the details.', objective: 'Follow an idea from problem to prototype.', title: ['Ideas are good.', 'Working things are better.'], mission: 'Make it real', action: 'Open build log' },
   { id: 'arena', name: 'Event Arena', sector: 'EA-04', number: '04', accent: '#e9e8de', position: { x: .50, y: .64 }, category: 'Built for the moment', description: 'The meeting point for ambitious minds. Learn, compete, and create together.', objective: 'Find your next challenge.', title: ['Good things happen', 'when we show up.'], mission: 'Meet the moment', action: 'Explore the arena' },
   { id: 'crew', name: 'Crew HQ', sector: 'CQ-05', number: '05', accent: '#a9c1a2', position: { x: .73, y: .72 }, category: 'The people make the place', description: 'Different disciplines. A common curiosity. Find the people behind the possibilities.', objective: 'Find your place in the crew.', title: ['No one builds', 'the future alone.'], mission: 'Find your people', action: 'Access crew database' },
+  { id: 'joinAIRS', name: 'Join AIRS', sector: 'CQ-06', number: '06', accent: '#a9c1a2', position: { x: .33, y: .72 }, category: 'Join the community', description: 'Join the AIRS community and connect with like-minded individuals passionate about artificial intelligence and technology.', objective: 'Join the AIRS community.', title: ['Be part of', 'the AIRS community'], mission: 'Join the community', action: 'Join the community' },
 ];
 
 export const byId = Object.fromEntries(districts.map(d => [d.id, d])) as Record<DistrictId, District>;
@@ -40,4 +41,32 @@ export const researchDomains = [
   { code: '03', name: 'Generative AI', detail: 'Move past the prompt. Explore how models create, how retrieval grounds their answers, and how to measure whether the output is actually useful.', tools: 'Language models / Retrieval / Responsible AI' },
   { code: '04', name: 'Autonomous systems', detail: 'Connect perception to action. Investigate planning, control, and robots that can reason about uncertain environments.', tools: 'Robotics / Planning / Simulation' },
   { code: '05', name: 'Edge intelligence', detail: 'Put useful intelligence where the data happens. Explore small models, constrained hardware, privacy, and real-time inference.', tools: 'Embedded systems / Optimization / On-device AI' },
+];
+
+export const joinReasons = [
+  { title: 'Learn by building', text: 'AIRS gives you a real environment to test ideas, learn with peers, and turn curiosity into shipped work.' },
+  { title: 'Work across disciplines', text: 'Explore AI, design, product thinking, problem framing, and technical execution without needing to do it alone.' },
+  { title: 'Grow with a community', text: 'Find people who are asking hard questions, building prototypes, and pushing each other forward.' },
+];
+
+export const departmentRoles = [
+  { name: 'Research & AI', summary: 'Experiment with machine learning, models, systems thinking, and evaluation.', focus: 'ML, data pipelines, evaluation, reasoning' },
+  { name: 'Product & Strategy', summary: 'Turn problems into clear opportunities and align technical work with real user needs.', focus: 'Problem framing, user research, roadmap design' },
+  { name: 'Design & Experience', summary: 'Craft clear interfaces, prototypes, and communication systems that make complex ideas usable.', focus: 'UX, storytelling, prototyping, visual systems' },
+  { name: 'Engineering & Systems', summary: 'Build the infrastructure, tooling, and integrations that support ambitious technical projects.', focus: 'Web, backend, tooling, deployment' },
+  { name: 'Operations & Community', summary: 'Coordinate people, events, onboarding, and the daily rhythm that keeps the community moving.', focus: 'Events, partner outreach, member support' },
+];
+
+export const openPositions = [
+  { title: 'Research Fellow', type: 'Technical', detail: 'Explore AI research, testing, and technical exploration with a small team.', cadence: 'Remote + weekly sprint reviews' },
+  { title: 'Product Builder', type: 'Strategy', detail: 'Drive concept definition, project planning, meaningful experimentation, and impact tracking.', cadence: 'Hybrid, 2–3 sessions per week' },
+  { title: 'Design Contributor', type: 'Creative', detail: 'Design interfaces, explainers, and prototype experiences that make AIRS initiatives easier to understand and use.', cadence: 'Portfolio review + collaborative design sprints' },
+  { title: 'Community Coordinator', type: 'Operations', detail: 'Support workshops, onboarding, and member engagement across AIRS activities.', cadence: 'Flexible, event-driven' },
+];
+
+export const recruitmentSteps = [
+  'Submit your interest and tell us what you are excited to build or learn.',
+  'Share your background, availability, and the type of work you want to contribute to.',
+  'Meet with the AIRS team for a short conversation about fit, goals, and momentum.',
+  'Join the community, start in a project stream, and grow through active contribution.',
 ];
