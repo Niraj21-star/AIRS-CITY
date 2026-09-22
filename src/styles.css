@@ -231,6 +231,34 @@ button:focus:not(:focus-visible),[tabindex='-1']:focus{outline:none}
 .crew-roles{display:flex;flex-wrap:wrap;gap:8px;margin:30px 0}
 .crew-roles>button{flex:1 0 calc(50% - 8px);display:flex;align-items:center;gap:9px;text-align:left;border:1px solid var(--line);min-height:45px;font-size:11px;padding:10px;color:#aebfc5}
 .crew-roles>button>span{font:8px var(--mono);color:#8da397}.crew-roles>button>svg{margin-left:auto}.crew-roles>button.active{border-color:var(--accent);color:var(--accent);background:#a9c1a20a}
+.recruitment-hero{padding:8px 0 12px}
+.recruitment-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:26px 0 30px}
+.recruitment-stat{display:flex;flex-direction:column;gap:10px;padding:14px 12px;border:1px solid var(--line);background:rgba(237,187,119,.02)}
+.recruitment-stat span{font:8px var(--mono);color:var(--accent)}
+.recruitment-stat strong{font-size:13px;font-weight:500;letter-spacing:-.02em}
+.recruitment-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:12px}
+.recruitment-card{display:flex;flex-direction:column;gap:14px;padding:18px 16px;border:1px solid var(--line);background:rgba(146,195,225,.02)}
+.recruitment-card span{font:8px var(--mono);color:var(--accent)}
+.recruitment-card h3{font-size:18px;font-weight:500;letter-spacing:-.03em;margin:0}
+.recruitment-card p{margin:0;font-size:12px;line-height:1.8;color:#b6c5ce}
+.department-list,.position-list,.process-list{display:flex;flex-direction:column;gap:16px}
+.department-item,.position-item,.process-step{display:flex;align-items:flex-start;gap:18px;padding:18px 0;border-top:1px solid var(--line)}
+.department-index,.process-step span{display:grid;place-items:center;width:38px;height:38px;border:1px solid var(--line);font:8px var(--mono);color:var(--accent)}
+.department-item h3,.position-head h3{margin:0 0 8px;font-size:20px;font-weight:500;letter-spacing:-.03em}
+.department-item p,.position-item p,.process-step p{margin:0;line-height:1.8;color:#b4c4cc;font-size:13px}
+.department-item span{display:block;margin-top:10px;font:8px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:#8caab5}
+.position-head{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:8px}
+.position-head span{font:8px var(--mono);color:#9ec1d5;letter-spacing:.12em;text-transform:uppercase}
+.position-item small{display:inline-block;margin-top:12px;font:8px var(--mono);color:var(--accent)}
+.application-form{display:flex;flex-direction:column;gap:22px;margin-top:12px}
+.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.form-field{display:flex;flex-direction:column;gap:9px;text-align:left;font:8px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:#8da8b7}
+.form-field input,.form-field select,.form-field textarea{width:100%;min-height:46px;padding:12px 14px;background:#09141b;border:1px solid var(--line);color:#ebf3f6;font:13px/1.6 var(--sans);letter-spacing:normal;text-transform:none;resize:vertical}
+.form-field textarea{min-height:110px}
+.form-wide{grid-column:1 / -1}
+.form-actions{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.form-actions .primary-action,.form-actions .quiet-button{margin-top:0}
+.application-success{margin-top:10px;padding:14px 16px;border:1px solid rgba(169,193,162,.4);background:rgba(169,193,162,.06);font-size:12px;line-height:1.8;color:#cfe4d0;display:flex;align-items:center;gap:10px}
 .dossier{display:flex;gap:24px;padding:24px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
 .dossier-photo{display:flex;flex-shrink:0;width:105px;height:133px;flex-direction:column;align-items:center;justify-content:center;gap:23px;border:1px solid var(--line);color:#7f968a;background:#a9c1a20a}
 .dossier-photo>span{font:7px var(--mono);text-transform:uppercase}.dossier h3{font-size:21px;font-weight:400;margin:12px 0}.dossier p:not(.eyebrow){font-size:12px;line-height:1.8;color:#aebfb8}.dossier .eyebrow{font-size:7px}

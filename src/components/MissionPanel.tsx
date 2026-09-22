@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type Dispatch, type CSSProperties } from 'react';
 import gsap from 'gsap';
-import { byId, originChapters, researchDomains, type DistrictId } from '../data/districts';
+import { byId, departmentRoles, joinReasons, openPositions, originChapters, recruitmentSteps, researchDomains, type DistrictId } from '../data/districts';
 import type { Action, WorldState } from '../store/world';
 import { Icon } from './Icon';
 
@@ -10,6 +10,15 @@ export function MissionPanel({ state, dispatch, close, returnToCity, reduced, pe
   const [selected, setSelected] = useState(0);
   const [view, setView] = useState('origin');
   const [saved, setSaved] = useState(() => { try { return localStorage.getItem('airs-city-recruitment-interest') === 'true'; } catch { return false; } });
+  const [submitted, setSubmitted] = useState(false);
+  const [application, setApplication] = useState({
+    name: '',
+    email: '',
+    year: '',
+    role: 'Research & AI',
+    interest: '',
+    motivation: '',
+  });
   useEffect(() => {
     const el = dialog.current!;
     const previous = document.activeElement as HTMLElement | null;
@@ -78,6 +87,65 @@ export function MissionPanel({ state, dispatch, close, returnToCity, reduced, pe
         )}
         </>}
         {d.id === 'crew' && <><p className="eyebrow">Crew database / Directory</p><h2 className="section-statement">Different strengths.<br/>Shared direction.</h2><div className="crew-roles">{['Leadership', 'Engineering', 'Research', 'Design', 'Operations', 'Alumni & community'].map((role, i) => <button key={role} aria-pressed={selected === i} className={selected === i ? 'active' : ''} onClick={() => setSelected(i)}><span>0{i + 1}</span>{role}<Icon name="chevron" size={15}/></button>)}</div><div className="dossier"><div className="dossier-photo"><Icon name="crew" size={48}/><span>Profile pending</span></div><div><p className="eyebrow">Personnel file / Unpublished</p><h3>{['Leadership', 'Engineering', 'Research', 'Design', 'Operations', 'Alumni & community'][selected]}</h3><p>Real people, not placeholders. Verified names, roles, and approved photos will populate this directory.</p></div></div><p className="editorial-note">No names, identities, memberships, or affiliations have been invented.</p></>}
+        {d.id === 'joinAIRS' && <>
+          <div className="recruitment-hero">
+            <p className="eyebrow">AIRS / Recruitment portal</p>
+            <h2 className="section-statement">Build what is next.<br/>Join the people behind it.</h2>
+            <p className="chapter-description">AIRS exists for students who want to learn deeply, try ambitious ideas, and build in public with others who care about thoughtful technology.</p>
+          </div>
+          <div className="recruitment-stats">
+            <div className="recruitment-stat"><span>01</span><strong>Why join</strong></div>
+            <div className="recruitment-stat"><span>02</span><strong>Roles</strong></div>
+            <div className="recruitment-stat"><span>03</span><strong>Open calls</strong></div>
+            <div className="recruitment-stat"><span>04</span><strong>Process</strong></div>
+          </div>
+          <nav className="chapter-tabs" aria-label="Join AIRS navigation">{['why', 'departments', 'positions', 'process', 'apply'].map(v => <button key={v} className={view === v ? 'active' : ''} onClick={() => setView(v)}>{v === 'why' ? 'Why join' : v === 'departments' ? 'Departments' : v === 'positions' ? 'Open roles' : v === 'process' ? 'Process' : 'Apply'}</button>)}</nav>
+          {view === 'why' && <>
+            <div className="recruitment-grid">
+              {joinReasons.map((reason, index) => <article key={reason.title} className="recruitment-card"><span>{String(index + 1).padStart(2, '0')}</span><h3>{reason.title}</h3><p>{reason.text}</p></article>)}
+            </div>
+            <p className="editorial-note">AIRS is built for students who want momentum, mentorship, and friends to build with.</p>
+          </>}
+          {view === 'departments' && <>
+            <div className="department-list">
+              {departmentRoles.map((role, index) => <div key={role.name} className="department-item"><div className="department-index">0{index + 1}</div><div><h3>{role.name}</h3><p>{role.summary}</p><span>{role.focus}</span></div></div>)}
+            </div>
+          </>}
+          {view === 'positions' && <>
+            <div className="position-list">
+              {openPositions.map((role) => <div key={role.title} className="position-item"><div className="position-head"><span>{role.type}</span><h3>{role.title}</h3></div><p>{role.detail}</p><small>{role.cadence}</small></div>)}
+            </div>
+          </>}
+          {view === 'process' && <>
+            <div className="process-list">
+              {recruitmentSteps.map((step, index) => <div key={step} className="process-step"><span>0{index + 1}</span><p>{step}</p></div>)}
+            </div>
+          </>}
+          {view === 'apply' && <>
+            <form className="application-form" onSubmit={(event) => {
+              event.preventDefault();
+              try { localStorage.setItem('airs-city-recruitment-interest', 'true'); setSaved(true); } catch { setSaved(false); }
+              setSubmitted(true);
+            }}>
+              <div className="form-grid">
+                <label className="form-field"><span>Name</span><input type="text" value={application.name} onChange={(event) => setApplication({ ...application, name: event.target.value })} placeholder="Your name" required /></label>
+                <label className="form-field"><span>Email</span><input type="email" value={application.email} onChange={(event) => setApplication({ ...application, email: event.target.value })} placeholder="name@school.edu" required /></label>
+                <label className="form-field"><span>Academic year</span><input type="text" value={application.year} onChange={(event) => setApplication({ ...application, year: event.target.value })} placeholder="Second year / freshman / graduate" required /></label>
+                <label className="form-field"><span>Department of interest</span><select value={application.role} onChange={(event) => setApplication({ ...application, role: event.target.value })}>
+                  {departmentRoles.map((role) => <option key={role.name} value={role.name}>{role.name}</option>)}
+                </select></label>
+                <label className="form-field form-wide"><span>What are you excited to work on?</span><textarea value={application.interest} onChange={(event) => setApplication({ ...application, interest: event.target.value })} placeholder="AI research, product prototyping, creative design, community building, etc." required /></label>
+                <label className="form-field form-wide"><span>Why do you want to join AIRS?</span><textarea value={application.motivation} onChange={(event) => setApplication({ ...application, motivation: event.target.value })} placeholder="Tell us about your goals, interests, and what you want to contribute." required /></label>
+              </div>
+              <div className="form-actions">
+                <button className="primary-action" type="submit">Submit application<Icon name="arrow"/></button>
+                <button className="quiet-button" type="button" onClick={() => { try { localStorage.setItem('airs-city-recruitment-interest', 'false'); setSaved(false); } catch {} setSubmitted(false); }}>Clear draft</button>
+              </div>
+            </form>
+            {submitted && <div className="application-success" role="status"><span className="status-dot"/>Application drafted locally. This prototype does not send data; it demonstrates the AIRS recruitment intake flow.</div>}
+            {!submitted && <p className="editorial-note">No personal data is transmitted in this prototype. This is a design-first recruitment intake flow.</p>}
+          </>}
+        </>}
       </div>
       <footer className="content-footer"><span><span className="status-dot"/>{persistentStorage ? 'Discovery saved on this device' : 'Progress kept for this visit'}</span><button onClick={close}>Back to {d.id === 'hq' ? 'HQ' : 'district'}<Icon name="back" size={15}/></button></footer>
     </article>

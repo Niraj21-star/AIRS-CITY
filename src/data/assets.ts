@@ -34,4 +34,5 @@ export const districtEnvironments: Record<DistrictId, string | null> = {
   garage:   null, // → garageEnvironment
   arena:    null, // → arenaEnvironment
   crew:     null, // → crewEnvironment
+  joinAIRS: null, // → joinAIRS environment
 };
