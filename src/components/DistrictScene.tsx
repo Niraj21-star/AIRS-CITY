@@ -3,6 +3,8 @@ import gsap from 'gsap';
 import { cityAsset, districtEnvironments } from '../data/assets';
 import { byId, districts, type District, type DistrictId } from '../data/districts';
 import { Icon } from './Icon';
+import { CrewGraph, PersonnelDossier } from './CrewNetwork';
+import { Person, Team } from '../data/crew';
 
 export function MiniMap({ district, onReturn, discovered }: { district: District; onReturn: () => void; discovered: DistrictId[] }) {
   return <button className="minimap" onClick={onReturn} aria-label={`You are at ${district.name}. Return to city map.`}>
@@ -20,15 +22,24 @@ export function DistrictScene({ id, begin, returnToCity, reduced, originComplete
   const scene = useRef<HTMLElement>(null);
   const image = districtEnvironments[id];
   const [environmentFailed, setEnvironmentFailed] = useState(false);
+  const [selectedPerson, setSelectedPerson] = useState<Person | null>(null);
+  const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);
+
   useEffect(() => {
     const ctx = gsap.context(() => {
       gsap.from('.scene-reveal', { y: reduced ? 0 : 28, opacity: 0, stagger: reduced ? 0 : .11, duration: reduced ? .15 : .95, ease: 'power3.out', delay: reduced ? 0 : .1 });
+      if (id === 'crew') gsap.from('.cn-world-overlay', { opacity: 0, scale: 0.96, duration: 1.2, ease: 'power2.out', delay: 0.4 });
     }, scene);
     return () => ctx.revert();
   }, [id, reduced]);
   return <section ref={scene} className={`district-scene scene-${id}`} style={{ '--accent': d.accent } as CSSProperties} aria-labelledby="district-title">
     <div className="district-environment">
       {!environmentFailed && <img src={image || cityAsset.src} onError={() => setEnvironmentFailed(true)} alt={image ? `${d.name} environment` : `${d.name}: temporary close aerial approach using the city reference image. Matching exterior not supplied.`} style={image ? undefined : { width: '210%', height: '210%', left: `${50 - d.position.x * 210}%`, top: `${50 - d.position.y * 210}%` }}/>}
+      {id === 'crew' && (
+        <div className="scene-crew-overlay">
+          <CrewGraph worldMode={true} selectedTeam={selectedTeam} setSelectedTeam={setSelectedTeam} setSelectedPerson={setSelectedPerson} />
+        </div>
+      )}
     </div>
     <div className="scene-vignette"/>
     <div className="district-heading scene-reveal"><span className="eyebrow"><span className="status-dot"/>Location discovered / You are here</span><div><span>{d.sector}</span><span className="thin-rule"/><span>{d.name}</span></div></div>
@@ -41,5 +52,6 @@ export function DistrictScene({ id, begin, returnToCity, reduced, originComplete
     </div>
     <div className="scene-coordinate scene-reveal"><span>Map X {d.position.x.toFixed(3)} / Y {d.position.y.toFixed(3)}</span><span>{environmentFailed ? 'Environment unavailable / Navigation active' : image ? 'Exterior view' : 'Aerial approach / Reference environment'}</span></div>
     <MiniMap district={d} onReturn={returnToCity} discovered={discovered}/>
+    {selectedPerson && <PersonnelDossier person={selectedPerson} onClose={() => setSelectedPerson(null)} />}
   </section>;
 }

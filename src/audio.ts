@@ -1,49 +1,139 @@
-export function createAmbience() {
-  const context = new AudioContext();
-  const master = context.createGain();
-  master.gain.value = 0;
-  master.connect(context.destination);
-  const hum = context.createOscillator();
-  hum.type = 'sine';
-  hum.frequency.value = 55;
-  const humGain = context.createGain();
-  humGain.gain.value = .055;
-  hum.connect(humGain).connect(master);
-  hum.start();
-  const noiseBuffer = context.createBuffer(1, context.sampleRate * 4, context.sampleRate);
-  const data = noiseBuffer.getChannelData(0);
-  for (let i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1) * .06;
-  const noise = context.createBufferSource();
-  noise.buffer = noiseBuffer;
-  noise.loop = true;
-  const lowpass = context.createBiquadFilter();
-  lowpass.type = 'lowpass';
-  lowpass.frequency.value = 340;
-  noise.connect(lowpass).connect(master);
-  noise.start();
-  let timer: ReturnType<typeof setTimeout> | undefined;
-  return {
-    async enable(enabled: boolean) {
-      clearTimeout(timer);
-      if (enabled) {
-        await context.resume();
-        master.gain.setTargetAtTime(.65, context.currentTime, .3);
-      } else {
-        master.gain.setTargetAtTime(0, context.currentTime, .12);
-        timer = setTimeout(() => { void context.suspend(); }, 650);
-      }
-    },
-    cue() {
-      if (context.state !== 'running') return;
-      const tone = context.createOscillator(), gain = context.createGain();
-      tone.frequency.setValueAtTime(480, context.currentTime);
-      tone.frequency.exponentialRampToValueAtTime(720, context.currentTime + .13);
-      gain.gain.setValueAtTime(.025, context.currentTime);
-      gain.gain.exponentialRampToValueAtTime(.0001, context.currentTime + .35);
-      tone.connect(gain).connect(master);
-      tone.start(); tone.stop(context.currentTime + .4);
-      tone.onended = () => { tone.disconnect(); gain.disconnect(); };
-    },
-    close() { clearTimeout(timer); hum.stop(); noise.stop(); void context.close(); },
-  };
+export type SFX = 'open' | 'close' | 'switch' | 'travel';
+
+class AudioEngine {
+  context: AudioContext | null = null;
+  masterGain: GainNode | null = null;
+  bgmGain: GainNode | null = null;
+  sfxGain: GainNode | null = null;
+  currentBGM: AudioBufferSourceNode | null = null;
+  muted = false;
+  initialized = false;
+
+  constructor() {
+    this.muted = localStorage.getItem('airs_mute') === 'true';
+  }
+
+  init() {
+    if (this.initialized) return;
+    this.context = new AudioContext();
+    this.masterGain = this.context.createGain();
+    this.bgmGain = this.context.createGain();
+    this.sfxGain = this.context.createGain();
+    
+    this.bgmGain.connect(this.masterGain);
+    this.sfxGain.connect(this.masterGain);
+    this.masterGain.connect(this.context.destination);
+    
+    this.applyMuteState();
+    this.initialized = true;
+  }
+
+  async resume() {
+    if (!this.initialized) this.init();
+    if (this.context?.state === 'suspended') {
+      await this.context.resume();
+    }
+  }
+
+  async suspend() {
+    if (this.context?.state === 'running') {
+      await this.context.suspend();
+    }
+  }
+
+  setMute(mute: boolean) {
+    this.muted = mute;
+    localStorage.setItem('airs_mute', mute.toString());
+    this.applyMuteState();
+  }
+
+  private applyMuteState() {
+    if (!this.masterGain || !this.context) return;
+    this.masterGain.gain.setTargetAtTime(this.muted ? 0 : 1, this.context.currentTime, 0.1);
+  }
+
+  // Fallback UI sounds (retaining existing procedural SFX for AirsLink)
+  cue(type: SFX) {
+    if (!this.initialized || !this.context || !this.sfxGain || this.muted) return;
+    const tone = this.context.createOscillator();
+    const gain = this.context.createGain();
+    tone.connect(gain).connect(this.sfxGain);
+    
+    const now = this.context.currentTime;
+    if (type === 'switch') {
+      tone.frequency.setValueAtTime(480, now);
+      tone.frequency.exponentialRampToValueAtTime(720, now + 0.13);
+      gain.gain.setValueAtTime(0.025, now);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.35);
+      tone.start(now); tone.stop(now + 0.4);
+    } else if (type === 'open') {
+      tone.frequency.setValueAtTime(600, now);
+      tone.frequency.exponentialRampToValueAtTime(1200, now + 0.2);
+      gain.gain.setValueAtTime(0.03, now);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.4);
+      tone.start(now); tone.stop(now + 0.5);
+    } else if (type === 'close') {
+      tone.frequency.setValueAtTime(1200, now);
+      tone.frequency.exponentialRampToValueAtTime(600, now + 0.2);
+      gain.gain.setValueAtTime(0.03, now);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.4);
+      tone.start(now); tone.stop(now + 0.5);
+    } else if (type === 'travel') {
+      tone.type = 'triangle';
+      tone.frequency.setValueAtTime(110, now);
+      tone.frequency.exponentialRampToValueAtTime(55, now + 1.5);
+      gain.gain.setValueAtTime(0.0, now);
+      gain.gain.linearRampToValueAtTime(0.05, now + 0.2);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.5);
+      tone.start(now); tone.stop(now + 1.6);
+    }
+    tone.onended = () => { tone.disconnect(); gain.disconnect(); };
+  }
+
+  async playBGM(url: string | null) {
+    if (!this.initialized) this.init();
+    if (!this.context || !this.bgmGain) return;
+
+    // Crossfade out existing BGM
+    if (this.currentBGM) {
+      const existing = this.currentBGM;
+      this.currentBGM = null; // Clear reference immediately
+      const currentGain = this.context.createGain();
+      currentGain.gain.value = 1;
+      existing.disconnect();
+      existing.connect(currentGain).connect(this.bgmGain);
+      currentGain.gain.setTargetAtTime(0, this.context.currentTime, 0.4);
+      setTimeout(() => {
+        try { existing.stop(); } catch {}
+        existing.disconnect();
+        currentGain.disconnect();
+      }, 1500);
+    }
+
+    if (!url) return;
+
+    try {
+      const response = await fetch(url);
+      if (!response.ok) return;
+      const arrayBuffer = await response.arrayBuffer();
+      const audioBuffer = await this.context.decodeAudioData(arrayBuffer);
+      
+      const source = this.context.createBufferSource();
+      source.buffer = audioBuffer;
+      source.loop = true;
+      
+      const fadeNode = this.context.createGain();
+      fadeNode.gain.setValueAtTime(0, this.context.currentTime);
+      fadeNode.gain.setTargetAtTime(1, this.context.currentTime, 0.5); // fade in
+      
+      source.connect(fadeNode).connect(this.bgmGain);
+      source.start();
+      
+      this.currentBGM = source;
+    } catch (e) {
+      console.warn("Failed to load BGM:", e);
+    }
+  }
 }
+
+export const audio = new AudioEngine();

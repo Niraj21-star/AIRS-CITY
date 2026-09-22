@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type Dispatch, type CSSProperties } from 'react';
 import gsap from 'gsap';
 import { byId, originChapters, researchDomains, type DistrictId } from '../data/districts';
+import { crewDatabaseEntities } from '../data/crew';
 import type { Action, WorldState } from '../store/world';
 import { Icon } from './Icon';
 
@@ -8,6 +9,7 @@ export function MissionPanel({ state, dispatch, close, returnToCity, reduced, pe
   const d = byId[state.district!];
   const dialog = useRef<HTMLDivElement>(null);
   const [selected, setSelected] = useState(0);
+  const [subRoleIndex, setSubRoleIndex] = useState(0);
   const [view, setView] = useState('origin');
   const [saved, setSaved] = useState(() => { try { return localStorage.getItem('airs-city-recruitment-interest') === 'true'; } catch { return false; } });
   useEffect(() => {
@@ -54,7 +56,123 @@ export function MissionPanel({ state, dispatch, close, returnToCity, reduced, pe
         {d.id === 'research' && <><p className="eyebrow">Research atlas / Exploratory domains</p><h2 className="section-statement">The frontier<br/>is not a fixed point.</h2><div className="research-selector" aria-label="Research domains">{researchDomains.map((domain, i) => <button key={domain.code} className={selected === i ? 'active' : ''} aria-expanded={selected === i} onClick={() => setSelected(i)}><span>{domain.code}</span><span>{domain.name}</span><Icon name={selected === i ? 'minus' : 'plus'} size={17}/></button>)}</div><div className="domain-detail" key={selected}><h3>{researchDomains[selected].name}</h3><p>{researchDomains[selected].detail}</p><span className="eyebrow">{researchDomains[selected].tools}</span></div><p className="editorial-note">Domain guide, not a claim of active labs or published research. Verified experiments can be added here.</p></>}
         {d.id === 'garage' && <><p className="eyebrow">Engineering / Build log</p><h2 className="section-statement">Proof beats<br/>possibility.</h2><p className="chapter-description">A place for work you can inspect. Every build follows the problem, the decisions, and the result.</p><div className="build-slot"><span className="build-wireframe" aria-hidden="true"><Icon name="garage" size={65}/></span><div><span className="eyebrow">Build slot 001</span><h3>The next build<br/>belongs here.</h3><span className="availability">Awaiting a verified project</span></div></div><button className="text-action" onClick={() => setSelected(selected ? 0 : 1)}>Inspect the case-study format<Icon name={selected ? 'minus' : 'plus'} size={17}/></button>{selected === 1 && <dl className="case-format">{[['01 / Problem', 'What needed to change?'], ['02 / Solution', 'What did the team build, and why?'], ['03 / Technology', 'Architecture, tools, and trade-offs.'], ['04 / Crew', 'Verified project contributors.'], ['05 / Result', 'Measured outcomes and honest limitations.'], ['06 / Source', 'Official GitHub repository and live demo.']].map(([title, text]) => <div key={title}><dt>{title}</dt><dd>{text}</dd></div>)}</dl>}<p className="editorial-note">No project, team, outcome, repository, or demo has been fabricated.</p></>}
         {d.id === 'arena' && <><nav className="chapter-tabs" aria-label="Arena archives">{['next event', 'archive', 'hall of fame'].map(v => <button key={v} className={view === v || (view === 'origin' && v === 'next event') ? 'active' : ''} onClick={() => selectView(v)}>{v}</button>)}</nav><EditorialEmpty code={view === 'hall of fame' ? 'ARENA / ACHIEVEMENTS' : view === 'archive' ? 'ARENA / MISSION ARCHIVE' : 'ARENA / STANDBY'} title={view === 'hall of fame' ? 'Good work deserves to be remembered.' : view === 'archive' ? 'Every gathering leaves a mark.' : 'The next big moment is still taking shape.'} text={view === 'hall of fame' ? 'A future home for verified competition results, milestones, and the teams that earned them. No achievements have been published yet.' : view === 'archive' ? 'Workshops, hackathons, and shared discoveries will be documented here once confirmed event records are supplied.' : 'Hackathons. Workshops. Competitions. Conversations that lead somewhere unexpected. Official event details and registration will appear when announced.'} foot={view === 'hall of fame' ? 'Hall of fame / Awaiting verified results' : view === 'archive' ? 'Event archive / No entries published' : 'Next event / To be announced'}/></>}
-        {d.id === 'crew' && <><p className="eyebrow">Crew database / Directory</p><h2 className="section-statement">Different strengths.<br/>Shared direction.</h2><div className="crew-roles">{['Leadership', 'Engineering', 'Research', 'Design', 'Operations', 'Alumni & community'].map((role, i) => <button key={role} aria-pressed={selected === i} className={selected === i ? 'active' : ''} onClick={() => setSelected(i)}><span>0{i + 1}</span>{role}<Icon name="chevron" size={15}/></button>)}</div><div className="dossier"><div className="dossier-photo"><Icon name="crew" size={48}/><span>Profile pending</span></div><div><p className="eyebrow">Personnel file / Unpublished</p><h3>{['Leadership', 'Engineering', 'Research', 'Design', 'Operations', 'Alumni & community'][selected]}</h3><p>Real people, not placeholders. Verified names, roles, and approved photos will populate this directory.</p></div></div><p className="editorial-note">No names, identities, memberships, or affiliations have been invented.</p></>}
+        {d.id === 'crew' && (() => {
+          const currentEntity = crewDatabaseEntities[selected] || crewDatabaseEntities[0];
+          const currentRole = currentEntity.roles[subRoleIndex] || currentEntity.roles[0];
+          return <>
+            <p className="eyebrow">Crew database / Organizational directory</p>
+            <h2 className="section-statement">Different strengths.<br/>Shared direction.</h2>
+            <p className="chapter-description">Official organizational structure of AIRS. Explore the executive council and the 7 specialized teams, their operational mandates, and functional roles.</p>
+
+            <div className="crew-roles" role="tablist" aria-label="AIRS departments and leadership">
+              {crewDatabaseEntities.map((entity, i) => (
+                <button
+                  key={entity.id}
+                  role="tab"
+                  aria-selected={selected === i}
+                  className={selected === i ? 'active' : ''}
+                  onClick={() => { setSelected(i); setSubRoleIndex(0); }}
+                >
+                  <span>{entity.number}</span>
+                  <span className="crew-role-label">{entity.name}</span>
+                  <span className="crew-role-code">{entity.code}</span>
+                  <Icon name="chevron" size={15}/>
+                </button>
+              ))}
+            </div>
+
+            <div className="crew-entity-bar">
+              <div className="crew-entity-header">
+                <span className="eyebrow">Sector CQ-05 / {currentEntity.code}</span>
+                <span className="crew-entity-category">{currentEntity.category}</span>
+              </div>
+              <h3 className="crew-entity-title">{currentEntity.name}</h3>
+              <p className="crew-entity-focus">{currentEntity.focus}</p>
+              <div className="crew-competencies">
+                {currentEntity.competencies.map(c => (
+                  <span key={c} className="crew-tag">{c}</span>
+                ))}
+              </div>
+            </div>
+
+            <div className="crew-subroles-header">
+              <span className="eyebrow">Inspect position / Roster tier</span>
+            </div>
+
+            <div className="crew-subroles" role="tablist" aria-label={`${currentEntity.name} positions`}>
+              {currentEntity.roles.map((r, rIdx) => (
+                <button
+                  key={r.id}
+                  role="tab"
+                  aria-selected={subRoleIndex === rIdx}
+                  className={`crew-subrole-btn ${subRoleIndex === rIdx ? 'active' : ''}`}
+                  onClick={() => setSubRoleIndex(rIdx)}
+                >
+                  <span className="status-dot"/>
+                  <span>{r.role}</span>
+                </button>
+              ))}
+            </div>
+
+            <div className="dossier">
+              <div className="dossier-photo">
+                <Icon name="crew" size={42}/>
+                <span className="dossier-badge">CQ-05 / {currentEntity.code}</span>
+                <span className="dossier-subbadge">RECORD PENDING</span>
+              </div>
+              <div className="dossier-details">
+                <div className="dossier-header-row">
+                  <div>
+                    <p className="eyebrow">{currentEntity.name} / {currentRole.role}</p>
+                    <h3>DATA PENDING</h3>
+                  </div>
+                  <span className="dossier-status-pill">
+                    <span className="status-dot"/>AWAITING VERIFIED ROSTER
+                  </span>
+                </div>
+
+                <div className="dossier-meta-grid">
+                  <div>
+                    <span className="dossier-meta-k">Designation</span>
+                    <span className="dossier-meta-v">{currentRole.role}</span>
+                  </div>
+                  <div>
+                    <span className="dossier-meta-k">Department</span>
+                    <span className="dossier-meta-v">{currentEntity.name}</span>
+                  </div>
+                  <div>
+                    <span className="dossier-meta-k">Hierarchy Level</span>
+                    <span className="dossier-meta-v">
+                      {currentRole.level === 'board' ? 'Executive Council' : currentRole.level === 'lead' ? 'Department Leadership' : currentRole.level === 'colead' ? 'Department Co-Lead' : 'Core Roster'}
+                    </span>
+                  </div>
+                </div>
+
+                {currentRole.responsibilities && (
+                  <div className="dossier-block">
+                    <span className="dossier-meta-k">Role Mandate & Responsibilities</span>
+                    <p>{currentRole.responsibilities}</p>
+                  </div>
+                )}
+
+                {currentRole.expertise && currentRole.expertise.length > 0 && (
+                  <div className="dossier-block">
+                    <span className="dossier-meta-k">Functional Focus Areas</span>
+                    <div className="dossier-tags">
+                      {currentRole.expertise.map(exp => (
+                        <span key={exp}>{exp}</span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <p className="dossier-policy-note">Real students, not placeholders. Verified names, official bios, and approved credentials will populate this dossier upon verified roster submission.</p>
+              </div>
+            </div>
+
+            <p className="editorial-note">Official AIRS organizational structure. No names, identities, memberships, or affiliations have been invented.</p>
+          </>;
+        })()}
       </div>
       <footer className="content-footer"><span><span className="status-dot"/>{persistentStorage ? 'Discovery saved on this device' : 'Progress kept for this visit'}</span><button onClick={close}>Back to {d.id === 'hq' ? 'HQ' : 'district'}<Icon name="back" size={15}/></button></footer>
     </article>

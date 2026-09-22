@@ -9,7 +9,7 @@ export function Boot({ ready, reduced, dispatch }: { ready: boolean; reduced: bo
     if (!ready) return;
     if (reduced) { dispatch({ type: 'INTRO_COMPLETE' }); return; }
     const ctx = gsap.context(() => {
-      gsap.timeline({ onComplete: () => dispatch({ type: 'INTRO_COMPLETE' }) })
+      gsap.timeline()
         // System init text cascades in
         .fromTo('.boot-sys-line', { opacity: 0, x: -7 }, { opacity: 1, x: 0, stagger: 0.1, duration: 0.3, ease: 'power2.out' }, 0)
         // System text fades out as world reveals
@@ -24,16 +24,25 @@ export function Boot({ ready, reduced, dispatch }: { ready: boolean; reduced: bo
         .to('.boot-status', { opacity: 1, duration: .4 }, 1.8)
         // Coordinate block drifts in
         .fromTo('.boot-coords', { opacity: 0 }, { opacity: 1, duration: 0.7 }, 1.5)
-        // World fade-out (original timing preserved)
-        .to(root.current, { opacity: 0, duration: 1.1, ease: 'power2.inOut' }, 3.1);
+        // Initialize button fades in
+        .fromTo('.skip-intro', { opacity: 0 }, { opacity: 1, duration: 0.8 }, 2.2);
     }, root);
     return () => ctx.revert();
   }, [ready, reduced, dispatch]);
 
-  // Timeout guard — unchanged
+  const onInitialize = () => {
+    if (!root.current) return;
+    dispatch({ type: 'AUDIO', enabled: true });
+    gsap.to(root.current, { opacity: 0, duration: 1.1, ease: 'power2.inOut', onComplete: () => {
+      dispatch({ type: 'INTRO_COMPLETE' });
+    } });
+  };
+
+  // No timeout guard. Wait for user to click Initialize.
   useEffect(() => {
-    const timer = window.setTimeout(() => dispatch({ type: 'INTRO_COMPLETE' }), 8000);
-    return () => clearTimeout(timer);
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Enter') onInitialize(); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
   }, [dispatch]);
 
   return (
@@ -69,7 +78,7 @@ export function Boot({ ready, reduced, dispatch }: { ready: boolean; reduced: bo
 
       {/* Unchanged corner + skip */}
       <span className="boot-corner eyebrow">A world for the curious</span>
-      <button className="skip-intro" onClick={() => dispatch({ type: 'INTRO_COMPLETE' })} autoFocus>Skip intro <span>ESC</span></button>
+      <button className="skip-intro" style={{ opacity: 0 }} onClick={onInitialize} autoFocus>Initialize <span>ENTER</span></button>
     </div>
   );
 }

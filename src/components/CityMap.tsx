@@ -5,6 +5,165 @@ import { cityAsset } from '../data/assets';
 import { cameraAt, clampCamera, type Action, type Camera, type WorldState } from '../store/world';
 import { Icon } from './Icon';
 
+// ── SVG coordinate system ────────────────────────────────────────────────────
+// Matches the existing map-grid and city-connections SVGs exactly.
+// svgX = pos.x * SVG_W,  svgY = pos.y * SVG_H
+const SVG_W = 1000;
+const SVG_H = 654;
+
+// ── Development-only debug overlay ───────────────────────────────────────────
+// import.meta.env.DEV is true only during `vite dev`; stripped from production
+// builds by Vite. Set the inner boolean to false to hide during active dev.
+const DEBUG_OVERLAY = false;
+
+// Convert a normalized [0,1] district position to SVG viewBox coordinates.
+function toSVG(pos: { x: number; y: number }) {
+  return { x: pos.x * SVG_W, y: pos.y * SVG_H };
+}
+
+// ── MapOverlay ────────────────────────────────────────────────────────────────
+// Transparent SVG rendered as the last child of .map-world.
+// viewBox="0 0 1000 654" + position:absolute inset:0 width/height:100%
+// ensures pixel-for-pixel alignment with the raster and all other SVGs.
+// The GSAP transform on .map-world moves raster + grid + connections + this
+// overlay identically — no separate camera math required.
+function MapOverlay({ state }: { state: WorldState }) {
+  const selected = byId[state.selected];
+  const hqPos    = toSVG(byId['hq'].position);
+  const selPos   = toSVG(selected.position);
+  const isCity   = state.level === 'CITY';
+
+  const destination = state.isTransitioning && state.transitionTo && state.transitionTo !== 'city'
+    ? byId[state.transitionTo] : null;
+  const destPos = destination ? toSVG(destination.position) : null;
+
+  return (
+    <svg
+      className="map-overlay"
+      viewBox={`0 0 ${SVG_W} ${SVG_H}`}
+      preserveAspectRatio="none"
+      aria-hidden="true"
+    >
+      <defs>
+        <radialGradient id="ov-dest-glow" cx="50%" cy="50%" r="50%">
+          <stop offset="0%"   stopColor="var(--accent)" stopOpacity="0.35" />
+          <stop offset="100%" stopColor="var(--accent)" stopOpacity="0" />
+        </radialGradient>
+      </defs>
+
+      {/* ── Route lines: HQ → each district (city view only) ── */}
+      {isCity && districts.map(d => {
+        if (d.id === 'hq') return null;
+        const dp = toSVG(d.position);
+        return (
+          <line
+            key={`ov-route-${d.id}`}
+            className={`overlay-route${state.selected === d.id ? ' overlay-route--active' : ''}`}
+            x1={hqPos.x} y1={hqPos.y}
+            x2={dp.x}    y2={dp.y}
+            style={{ '--district-accent': d.accent } as CSSProperties}
+          />
+        );
+      })}
+
+      {/* ── Active travel route ── */}
+      {state.isTransitioning && destPos && (
+        <line
+          className="overlay-route overlay-route--traveling"
+          x1={hqPos.x} y1={hqPos.y}
+          x2={destPos.x} y2={destPos.y}
+          style={{ '--district-accent': destination!.accent } as CSSProperties}
+        />
+      )}
+
+      {/* ── Selection ring around selected waypoint ── */}
+      {isCity && (
+        <circle
+          className="overlay-selection-ring"
+          cx={selPos.x} cy={selPos.y} r={18}
+          style={{ '--district-accent': selected.accent } as CSSProperties}
+        />
+      )}
+
+      {/* ── Destination marker glow + dot ── */}
+      {isCity && state.selected !== 'hq' && (
+        <>
+          <circle
+            className="overlay-dest-glow"
+            cx={selPos.x} cy={selPos.y} r={28}
+            fill="url(#ov-dest-glow)"
+          />
+          <circle
+            className="overlay-dest-dot"
+            cx={selPos.x} cy={selPos.y} r={4}
+            style={{ '--district-accent': selected.accent } as CSSProperties}
+          />
+        </>
+      )}
+
+      {/* ── DEBUG LAYER (dev only, stripped from production build) ── */}
+      {DEBUG_OVERLAY && (
+        <g className="overlay-debug" data-debug="map-overlay">
+          {/* SVG boundary rect — must trace the raster image edges exactly */}
+          <rect
+            x={0.5} y={0.5}
+            width={SVG_W - 1} height={SVG_H - 1}
+            fill="none" stroke="#ff0055"
+            strokeWidth={1} strokeDasharray="8 4"
+            opacity={0.85}
+          />
+          {/* Diagonal proof lines */}
+          <line x1={0} y1={0} x2={SVG_W} y2={SVG_H} stroke="#ff005540" strokeWidth={0.5} />
+          <line x1={SVG_W} y1={0} x2={0} y2={SVG_H} stroke="#ff005540" strokeWidth={0.5} />
+
+          {/* Crosshair + coordinate label for each district */}
+          {districts.map(d => {
+            const p   = toSVG(d.position);
+            const arm = 12;
+            return (
+              <g key={`dbg-${d.id}`}>
+                <line x1={p.x - arm} y1={p.y} x2={p.x + arm} y2={p.y}
+                      stroke="#00ff88" strokeWidth={0.75} opacity={0.9} />
+                <line x1={p.x} y1={p.y - arm} x2={p.x} y2={p.y + arm}
+                      stroke="#00ff88" strokeWidth={0.75} opacity={0.9} />
+                <circle cx={p.x} cy={p.y} r={2.5} fill="#00ff88" opacity={0.9} />
+                {/* Label background */}
+                <rect x={p.x + arm + 2} y={p.y - 11}
+                      width={114} height={23} rx={2}
+                      fill="#000000" opacity={0.6} />
+                <text x={p.x + arm + 6} y={p.y - 1}
+                      fill="#00ff88" fontSize={7} fontFamily="monospace">
+                  {d.id.toUpperCase()}
+                </text>
+                <text x={p.x + arm + 6} y={p.y + 9}
+                      fill="#88ffcc" fontSize={6} fontFamily="monospace" opacity={0.9}>
+                  {`svg(${p.x.toFixed(0)},${p.y.toFixed(0)}) norm(${d.position.x},${d.position.y})`}
+                </text>
+              </g>
+            );
+          })}
+
+          {/* Active route dashed highlight */}
+          {isCity && state.selected !== 'hq' && (
+            <line
+              x1={hqPos.x} y1={hqPos.y}
+              x2={selPos.x} y2={selPos.y}
+              stroke="#ffff00" strokeWidth={1}
+              strokeDasharray="5 5" opacity={0.65}
+            />
+          )}
+
+          {/* State readout */}
+          <rect x={2} y={2} width={240} height={16} rx={2} fill="#000" opacity={0.55} />
+          <text x={5} y={13} fill="#ffff44" fontSize={7} fontFamily="monospace">
+            {`DEBUG · ${state.level} · sel=${state.selected} · transit=${state.isTransitioning}`}
+          </text>
+        </g>
+      )}
+    </svg>
+  );
+}
+
 type Props = { state: WorldState; dispatch: Dispatch<Action>; reduced: boolean; travel: (id: DistrictId) => void; onReady: () => void };
 
 export function CityMap({ state, dispatch, reduced, travel, onReady }: Props) {
@@ -12,6 +171,24 @@ export function CityMap({ state, dispatch, reduced, travel, onReady }: Props) {
   const world = useRef<HTMLDivElement>(null);
   const camera = useRef<Camera>({ x: 0, y: 0, scale: 1 });
   const size = useRef({ width: 1, height: 1, worldWidth: 1, worldHeight: 1 });
+  const idleTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+
+  const startBreathing = () => {
+    clearTimeout(idleTimer.current);
+    idleTimer.current = setTimeout(() => {
+      if (reduced || latest.current.level !== 'CITY' || latest.current.isTransitioning || drag.current) return;
+      gsap.killTweensOf(camera.current);
+      gsap.to(camera.current, {
+        x: camera.current.x - (Math.random() * 8 + 4),
+        y: camera.current.y - (Math.random() * 6 + 3),
+        duration: 14,
+        ease: 'sine.inOut',
+        yoyo: true,
+        repeat: -1,
+        onUpdate: apply
+      });
+    }, 2500);
+  };
   const drag = useRef<{ x: number; y: number; cx: number; cy: number; moved: boolean } | null>(null);
   const [zoom, setZoom] = useState(1);
   const [mapError, setMapError] = useState(false);
@@ -29,7 +206,8 @@ export function CityMap({ state, dispatch, reduced, travel, onReady }: Props) {
   };
   const animateCamera = (target: Camera, duration = .8) => {
     gsap.killTweensOf(camera.current);
-    gsap.to(camera.current, { ...target, duration: reduced ? .12 : duration, ease: 'power3.inOut', onUpdate: apply, onComplete: () => setZoom(target.scale) });
+    clearTimeout(idleTimer.current);
+    gsap.to(camera.current, { ...target, duration: reduced ? .12 : duration, ease: 'power3.inOut', onUpdate: apply, onComplete: () => { setZoom(target.scale); startBreathing(); } });
   };
 
   useLayoutEffect(() => {
@@ -52,7 +230,8 @@ export function CityMap({ state, dispatch, reduced, travel, onReady }: Props) {
     const observer = new ResizeObserver(measure);
     observer.observe(viewport.current!);
     measure();
-    return () => { observer.disconnect(); gsap.killTweensOf(camera.current); };
+    startBreathing();
+    return () => { observer.disconnect(); clearTimeout(idleTimer.current); gsap.killTweensOf(camera.current); };
   }, []);
 
   useEffect(() => {
@@ -62,8 +241,9 @@ export function CityMap({ state, dispatch, reduced, travel, onReady }: Props) {
     gsap.killTweensOf(camera.current);
     if (reduced || state.transitionTo === 'city') animateCamera(target, 1.8);
     else {
+      clearTimeout(idleTimer.current);
       const settle = cameraAt(byId[state.transitionTo].position, width, height, worldWidth, worldHeight, 3.92);
-      const timeline = gsap.timeline({ onUpdate: apply, onComplete: () => setZoom(target.scale) });
+      const timeline = gsap.timeline({ onUpdate: apply, onComplete: () => { setZoom(target.scale); startBreathing(); } });
       timeline.to(camera.current, { scale: camera.current.scale * 1.012, duration: .16, ease: 'sine.in' })
         .to(camera.current, { ...settle, duration: 1.72, ease: 'power3.inOut' })
         .to(camera.current, { ...target, duration: .32, ease: 'power2.out' });
@@ -104,6 +284,7 @@ export function CityMap({ state, dispatch, reduced, travel, onReady }: Props) {
       onPointerDown={e => {
         if ((e.target as HTMLElement).closest('button') || state.isTransitioning) return;
         gsap.killTweensOf(camera.current);
+        clearTimeout(idleTimer.current);
         drag.current = { x: e.clientX, y: e.clientY, cx: camera.current.x, cy: camera.current.y, moved: false };
         e.currentTarget.setPointerCapture(e.pointerId);
       }}
@@ -115,7 +296,7 @@ export function CityMap({ state, dispatch, reduced, travel, onReady }: Props) {
         Object.assign(camera.current, clampCamera({ x: drag.current.cx + dx, y: drag.current.cy + dy, scale: camera.current.scale }, width, height, worldWidth, worldHeight));
         apply();
       }}
-      onPointerUp={() => { drag.current = null; }} onPointerCancel={() => { drag.current = null; }}>
+      onPointerUp={() => { drag.current = null; startBreathing(); }} onPointerCancel={() => { drag.current = null; startBreathing(); }}>
       <div className="map-world" ref={world}>
         <img className="master-image" src={cityAsset.src} alt={cityAsset.description} fetchPriority="high" draggable="false" onLoad={onReady} onError={() => { setMapError(true); onReady(); }} />
         <div className="map-grade" />
@@ -149,9 +330,23 @@ export function CityMap({ state, dispatch, reduced, travel, onReady }: Props) {
             <span className="waypoint-stem"/><span className="waypoint-label"><span className="waypoint-code">{d.sector}<span className="marker-status">{state.discovered.includes(d.id) ? ' / DISCOVERED' : d.id === 'hq' ? ' / START HERE' : ''}</span></span><span className="waypoint-name">{d.name}</span><span className="waypoint-enter">{state.discovered.includes(d.id) ? 'Revisit district' : 'Enter district'} <Icon name="arrow" size={13}/></span></span>
           </button>)}
         </div>
+
+        {/* ── SVG interaction & debug overlay ──────────────────────────────── */}
+        {/* Last child inside .map-world → shares GSAP camera transform        */}
+        {/* viewBox="0 0 1000 654" matches map-grid + city-connections exactly  */}
+        <MapOverlay state={state} />
       </div>
     </div>
     <div className="city-vignette" />
+
+    {/* ── PHASE 3: TRAVEL ANTICIPATION HUD ── */}
+    {state.isTransitioning && state.transitionTo && state.transitionTo !== 'city' && (
+      <div className="travel-hud">
+        <span className="travel-hud-label">ROUTING TO SECTOR {byId[state.transitionTo].sector}</span>
+        <span className="travel-hud-target">{byId[state.transitionTo].name.toUpperCase()}</span>
+      </div>
+    )}
+
     {mapError && <div className="asset-error" role="alert">Map image unavailable. Every district is still accessible through the district index.</div>}
     <div className="compass" aria-hidden="true"><span>N</span><svg width="52" height="52" viewBox="0 0 52 52"><circle cx="26" cy="26" r="22" fill="none" stroke="currentColor" opacity=".25"/><path d="m26 11 5 20-5-3-5 3z" fill="currentColor"/><path d="M26 4v4m22 18h-4M26 48v-4M4 26h4" stroke="currentColor"/></svg><small>SECTOR 001</small></div>
     <div className="map-legend" aria-label="Waypoint legend"><span><i className="legend-available"/>Available</span><span><i className="legend-selected"/>Selected</span><span><Icon name="check" size={10}/>Discovered</span></div>
