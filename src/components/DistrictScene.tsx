@@ -36,7 +36,7 @@ export function DistrictScene({ id, begin, returnToCity, reduced, originComplete
     <div className="scene-copy">
       <p className="eyebrow scene-reveal">{d.category}</p>
       <h1 id="district-title" className="scene-reveal" tabIndex={-1}>{d.title[0]}<br/><span>{d.title[1]}</span></h1>
-      <div className="mission-brief scene-reveal"><span className="mission-index">{d.number}</span><div><p className="eyebrow">{id === 'hq' && originComplete ? 'Mission complete / Replay available' : `Mission ${d.number}`}</p><h2>{d.mission}</h2><p>{d.objective}</p></div></div>
+      <div className="mission-brief scene-reveal"><span className="mission-index">{d.number}</span><div><p className="eyebrow">{id === 'hq' && originComplete ? 'Mission complete / Replay available' : id === 'arena' ? 'Upcoming Event' : `Mission ${d.number}`}</p><h2>{id === 'arena' ? 'VORTEXA 3.0' : d.mission}</h2><p>{id === 'arena' ? '12 hours Hackathon • Prize Pool Upto ₹75000' : d.objective}</p></div></div>
       <button className="primary-action scene-reveal" onClick={begin}>{id === 'hq' && originComplete ? 'Revisit the origin' : d.action}<Icon name="arrow"/></button>
     </div>
     <div className="scene-coordinate scene-reveal"><span>Map X {d.position.x.toFixed(3)} / Y {d.position.y.toFixed(3)}</span><span>{environmentFailed ? 'Environment unavailable / Navigation active' : image ? 'Exterior view' : 'Aerial approach / Reference environment'}</span></div>
