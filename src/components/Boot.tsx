@@ -30,23 +30,37 @@ export function Boot({ ready, reduced, dispatch }: { ready: boolean; reduced: bo
     return () => ctx.revert();
   }, [ready, reduced, dispatch]);
 
+  const initializedRef = useRef(false);
+
   const onInitialize = () => {
-    if (!root.current) return;
+    if (initializedRef.current || !root.current) return;
+    initializedRef.current = true;
     dispatch({ type: 'AUDIO', enabled: true });
-    gsap.to(root.current, { opacity: 0, duration: 1.1, ease: 'power2.inOut', onComplete: () => {
+    gsap.to(root.current, { opacity: 0, duration: 0.9, ease: 'power2.inOut', onComplete: () => {
       dispatch({ type: 'INTRO_COMPLETE' });
     } });
   };
 
-  // No timeout guard. Wait for user to click Initialize.
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Enter') onInitialize(); };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        onInitialize();
+      }
+    };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [dispatch]);
+  }, []);
 
   return (
-    <div className="boot" ref={root} role="dialog" aria-modal="true" aria-label="Entering AIRS City">
+    <div
+      className="boot"
+      ref={root}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Entering AIRS City"
+      onClick={onInitialize}
+    >
       {/* Scan line — decorative */}
       <div className="boot-scanline" aria-hidden="true"/>
 

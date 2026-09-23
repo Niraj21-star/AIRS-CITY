@@ -12,6 +12,10 @@ export interface Person {
   links?: { label: string; url: string }[];
   photo?: string;
   level: CrewHierarchyLevel;
+  /** Optional verification metadata for internal content pipeline */
+  verified?: boolean;
+  verificationSource?: string;
+  verifiedAt?: string;
 }
 
 export interface Team {

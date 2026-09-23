@@ -164,9 +164,16 @@ function MapOverlay({ state }: { state: WorldState }) {
   );
 }
 
-type Props = { state: WorldState; dispatch: Dispatch<Action>; reduced: boolean; travel: (id: DistrictId) => void; onReady: () => void };
+type Props = {
+  state: WorldState;
+  dispatch: Dispatch<Action>;
+  reduced: boolean;
+  travel: (id: DistrictId) => void;
+  onReady: () => void;
+  airsLinkOpen?: boolean;
+};
 
-export function CityMap({ state, dispatch, reduced, travel, onReady }: Props) {
+export function CityMap({ state, dispatch, reduced, travel, onReady, airsLinkOpen }: Props) {
   const viewport = useRef<HTMLDivElement>(null);
   const world = useRef<HTMLDivElement>(null);
   const camera = useRef<Camera>({ x: 0, y: 0, scale: 1 });
@@ -175,20 +182,67 @@ export function CityMap({ state, dispatch, reduced, travel, onReady }: Props) {
 
   const startBreathing = () => {
     clearTimeout(idleTimer.current);
+    if (reduced || airsLinkOpen || size.current.width < 760 || (typeof document !== 'undefined' && document.hidden)) return;
     idleTimer.current = setTimeout(() => {
-      if (reduced || latest.current.level !== 'CITY' || latest.current.isTransitioning || drag.current) return;
+      if (
+        reduced ||
+        airsLinkOpen ||
+        size.current.width < 760 ||
+        latest.current.level !== 'CITY' ||
+        latest.current.isTransitioning ||
+        drag.current ||
+        (typeof document !== 'undefined' && document.hidden)
+      ) return;
       gsap.killTweensOf(camera.current);
+      const ampX = (Math.random() * 2 + 2) * (Math.random() > 0.5 ? 1 : -1);
+      const ampY = (Math.random() * 2 + 1.5) * (Math.random() > 0.5 ? 1 : -1);
       gsap.to(camera.current, {
-        x: camera.current.x - (Math.random() * 8 + 4),
-        y: camera.current.y - (Math.random() * 6 + 3),
-        duration: 14,
+        x: camera.current.x + ampX,
+        y: camera.current.y + ampY,
+        duration: 8,
         ease: 'sine.inOut',
         yoyo: true,
         repeat: -1,
         onUpdate: apply
       });
-    }, 2500);
+    }, 5000);
   };
+
+  const stopBreathing = (restart = true) => {
+    clearTimeout(idleTimer.current);
+    gsap.killTweensOf(camera.current);
+    if (restart) startBreathing();
+  };
+
+  useEffect(() => {
+    if (airsLinkOpen) {
+      stopBreathing(false);
+      return;
+    }
+    const handleInput = () => {
+      stopBreathing(true);
+    };
+    const handleVisibility = () => {
+      if (document.hidden) {
+        stopBreathing(false);
+      } else {
+        startBreathing();
+      }
+    };
+    window.addEventListener('pointermove', handleInput, { passive: true });
+    window.addEventListener('touchstart', handleInput, { passive: true });
+    window.addEventListener('keydown', handleInput, { passive: true });
+    window.addEventListener('wheel', handleInput, { passive: true });
+    document.addEventListener('visibilitychange', handleVisibility);
+
+    return () => {
+      window.removeEventListener('pointermove', handleInput);
+      window.removeEventListener('touchstart', handleInput);
+      window.removeEventListener('keydown', handleInput);
+      window.removeEventListener('wheel', handleInput);
+      document.removeEventListener('visibilitychange', handleVisibility);
+    };
+  }, [airsLinkOpen]);
   const drag = useRef<{ x: number; y: number; cx: number; cy: number; moved: boolean } | null>(null);
   const [zoom, setZoom] = useState(1);
   const [mapError, setMapError] = useState(false);
@@ -322,10 +376,16 @@ export function CityMap({ state, dispatch, reduced, travel, onReady }: Props) {
         <div className="geographic-label label-west">West sector</div><div className="geographic-label label-east">East sector</div>
         <div className="waypoints" role="navigation" aria-label="City districts">
           {districts.map(d => <button key={d.id} className={`waypoint ${state.selected === d.id ? 'selected' : ''} ${state.discovered.includes(d.id) ? 'discovered' : ''}`} style={{ left: `${d.position.x * 100}%`, top: `${d.position.y * 100}%`, '--accent': d.accent } as CSSProperties}
-            aria-label={`${d.name}, ${d.sector}. ${state.discovered.includes(d.id) ? 'Discovered' : 'Unexplored'}. Select destination.`}
+            aria-label={`Navigate to ${d.name}. Sector ${d.sector}. ${state.discovered.includes(d.id) ? 'Discovered' : 'Unexplored'}.`}
             aria-pressed={state.selected === d.id} onFocus={() => focusWaypoint(d.id)}
             onMouseEnter={() => { if (matchMedia('(hover: hover)').matches) dispatch({ type: 'SELECT', id: d.id }); }}
-            onClick={() => { focusWaypoint(d.id); if (matchMedia('(hover: hover) and (min-width: 760px)').matches) travel(d.id); }}>
+            onClick={() => { focusWaypoint(d.id); if (matchMedia('(hover: hover) and (min-width: 760px)').matches) travel(d.id); }}
+            onKeyDown={e => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                travel(d.id);
+              }
+            }}>
             <span className="waypoint-symbol"><span className="waypoint-orbit"/><Icon name={state.discovered.includes(d.id) ? 'check' : d.id} size={21}/></span>
             <span className="waypoint-stem"/><span className="waypoint-label"><span className="waypoint-code">{d.sector}<span className="marker-status">{state.discovered.includes(d.id) ? ' / DISCOVERED' : d.id === 'hq' ? ' / START HERE' : ''}</span></span><span className="waypoint-name">{d.name}</span><span className="waypoint-enter">{state.discovered.includes(d.id) ? 'Revisit district' : 'Enter district'} <Icon name="arrow" size={13}/></span></span>
           </button>)}

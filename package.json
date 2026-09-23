@@ -7,7 +7,7 @@
     "dev": "vite --host 0.0.0.0",
     "build": "tsc -b && vite build",
     "preview": "vite preview --host 0.0.0.0",
-    "test": "node --experimental-strip-types --test tests/world.test.ts"
+    "test": "node --experimental-strip-types --test tests/world.test.ts tests/content.test.ts"
   },
   "dependencies": {
     "@fontsource-variable/space-grotesk": "5.3.0",

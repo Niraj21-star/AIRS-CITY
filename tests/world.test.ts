@@ -1,6 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { districts } from '../src/data/districts.ts';
+import { crewData } from '../src/data/crew.ts';
+import { airsProjects } from '../src/data/projects.ts';
+import { airsEvents } from '../src/data/events.ts';
+import { officialLinks } from '../src/data/links.ts';
+import { validateCrew, validateProjects, validateEvents, validateLinks } from '../src/data/validate.ts';
 import {
   cameraAt, clampCamera, districtIds, initialWorld, parseRoute, readProgress,
   routeHash, worldReducer, type Action, type Route,
@@ -263,4 +268,34 @@ test('clampCamera respects scaled bounds, preserves in-bounds positions, and doe
   for (const size of [200, 400]) {
     assert.deepEqual(clampCamera({ x: -100, y: 100, scale: 2 }, 800, 800, size, size), { x: 0, y: 0, scale: 2 });
   }
+});
+
+test('production data integrity passes all validation rules', () => {
+  assert.deepEqual(validateCrew(crewData), []);
+  assert.deepEqual(validateProjects(airsProjects), []);
+  assert.deepEqual(validateEvents(airsEvents), []);
+  assert.deepEqual(validateLinks(officialLinks), []);
+});
+
+test('data validation catches duplicate person IDs and invalid team names', () => {
+  const badCrew = {
+    ...crewData,
+    board: [
+      ...crewData.board,
+      { id: 'board-pres', role: 'President', level: 'board' as const },
+    ],
+  };
+  const errors = validateCrew(badCrew);
+  assert.ok(errors.some(e => e.message.includes("Duplicate person ID 'board-pres'")));
+
+  const badTeam = {
+    board: [],
+    teams: [{
+      id: 'fake-team',
+      name: 'Unapproved Fake Team',
+      members: [],
+    }],
+  };
+  const teamErrors = validateCrew(badTeam);
+  assert.ok(teamErrors.some(e => e.message.includes('does not match official team structure')));
 });

@@ -1,6 +1,6 @@
 import type { DistrictId } from '../data/districts';
 
-export type IconName = DistrictId | 'arrow' | 'close' | 'sound' | 'mute' | 'map' | 'plus' | 'minus' | 'target' | 'chevron' | 'check' | 'help' | 'back' | 'expand';
+export type IconName = DistrictId | 'arrow' | 'close' | 'sound' | 'mute' | 'map' | 'plus' | 'minus' | 'target' | 'chevron' | 'check' | 'help' | 'back' | 'expand' | 'play';
 const paths: Record<IconName, React.ReactNode> = {
   hq: <><path d="M5 20V9l7-5 7 5v11M9 20v-6h6v6M3 20h18M9 9h6"/><path d="M12 4V1"/></>,
   research: <><path d="m9 3-1 6-5 9a2 2 0 0 0 2 3h14a2 2 0 0 0 2-3l-5-9-1-6M8 3h8M7 14h10"/><path d="M10 17h.01M14 18h.01"/></>,
@@ -18,6 +18,7 @@ const paths: Record<IconName, React.ReactNode> = {
   help: <><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 4 2c-1.5 1-1.5 1.5-1.5 3M12 17h.01"/></>,
   back: <path d="M20 12H4m6-6-6 6 6 6"/>,
   expand: <path d="M8 3H3v5M16 3h5v5M21 16v5h-5M3 16v5h5"/>,
+  play: <polygon points="7 4 19 12 7 20 7 4" fill="currentColor" stroke="none"/>,
 };
 
 export function Icon({ name, size = 20 }: { name: IconName; size?: number }) {

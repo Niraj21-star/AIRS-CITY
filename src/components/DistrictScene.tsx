@@ -20,6 +20,7 @@ export function MiniMap({ district, onReturn, discovered }: { district: District
 export function DistrictScene({ id, begin, returnToCity, reduced, originComplete, discovered }: { id: DistrictId; begin: () => void; returnToCity: () => void; reduced: boolean; originComplete: boolean; discovered: DistrictId[] }) {
   const d = byId[id];
   const scene = useRef<HTMLElement>(null);
+  const arrivalBadgeRef = useRef<HTMLDivElement>(null);
   const image = districtEnvironments[id];
   const [environmentFailed, setEnvironmentFailed] = useState(false);
   const [selectedPerson, setSelectedPerson] = useState<Person | null>(null);
@@ -30,9 +31,56 @@ export function DistrictScene({ id, begin, returnToCity, reduced, originComplete
       gsap.from('.scene-reveal', { y: reduced ? 0 : 28, opacity: 0, stagger: reduced ? 0 : .11, duration: reduced ? .15 : .95, ease: 'power3.out', delay: reduced ? 0 : .1 });
       if (id === 'crew') gsap.from('.cn-world-overlay', { opacity: 0, scale: 0.96, duration: 1.2, ease: 'power2.out', delay: 0.4 });
     }, scene);
-    return () => ctx.revert();
+
+    let badgeTimer: ReturnType<typeof setTimeout> | undefined;
+    let badgeTl: gsap.core.Timeline | undefined;
+
+    if (arrivalBadgeRef.current) {
+      if (reduced) {
+        gsap.set(arrivalBadgeRef.current, { opacity: 1 });
+        badgeTimer = setTimeout(() => {
+          if (arrivalBadgeRef.current) {
+            gsap.to(arrivalBadgeRef.current, {
+              opacity: 0,
+              duration: 0.3,
+              onComplete: () => {
+                if (arrivalBadgeRef.current) arrivalBadgeRef.current.style.display = 'none';
+              }
+            });
+          }
+        }, 1200);
+      } else {
+        badgeTl = gsap.timeline();
+        badgeTl.fromTo(arrivalBadgeRef.current,
+          { opacity: 0, y: -10, scale: 0.98 },
+          { opacity: 1, y: 0, scale: 1, duration: 0.45, ease: 'power2.out', delay: 0.15 }
+        )
+        .to(arrivalBadgeRef.current, {
+          opacity: 0,
+          y: -6,
+          scale: 0.98,
+          duration: 0.5,
+          ease: 'power2.in',
+          delay: 1.1,
+          onComplete: () => {
+            if (arrivalBadgeRef.current) arrivalBadgeRef.current.style.display = 'none';
+          }
+        });
+      }
+    }
+
+    return () => {
+      ctx.revert();
+      if (badgeTimer) clearTimeout(badgeTimer);
+      if (badgeTl) badgeTl.kill();
+    };
   }, [id, reduced]);
   return <section ref={scene} className={`district-scene scene-${id}`} style={{ '--accent': d.accent } as CSSProperties} aria-labelledby="district-title">
+    <div className="district-arrival-badge" ref={arrivalBadgeRef} aria-hidden="true">
+      <span className="arrival-badge-sector">SECTOR {d.sector}</span>
+      <span className="arrival-badge-rule"/>
+      <span className="arrival-badge-name">{d.name}</span>
+    </div>
     <div className="district-environment">
       {!environmentFailed && <img src={image || cityAsset.src} onError={() => setEnvironmentFailed(true)} alt={image ? `${d.name} environment` : `${d.name}: temporary close aerial approach using the city reference image. Matching exterior not supplied.`} style={image ? undefined : { width: '210%', height: '210%', left: `${50 - d.position.x * 210}%`, top: `${50 - d.position.y * 210}%` }}/>}
       {id === 'crew' && (

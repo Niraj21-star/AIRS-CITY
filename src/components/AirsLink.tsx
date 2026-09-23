@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import gsap from 'gsap';
 import { byId, districts, researchDomains, type DistrictId } from '../data/districts';
+import { airsProjects, categoryLabels, type ProjectCategory } from '../data/projects';
+import type { EventCategory } from '../data/events';
 import type { WorldState } from '../store/world';
 import { AirsMark, Icon } from './Icon';
 import { audio } from '../audio';
@@ -31,6 +33,7 @@ interface Props {
   onClose: () => void;
   reduced: boolean;
   audioEnabled: boolean;
+  onToggleAudio?: () => void;
   intel: IntelItem[];
   readIntel: Set<string>;
   markIntelRead: (id: string) => void;
@@ -710,67 +713,8 @@ function ResearchApp({ onLocate }: { onLocate: (id: DistrictId) => void }) {
 // Uses real district descriptions as project stubs.
 // No fabricated metrics, team data, or outcomes.
 
-type ProjectCategory = 'all' | 'ai-ml' | 'software' | 'robotics' | 'open-source';
 type ProjectView = { kind: 'list' } | { kind: 'dossier'; districtId: DistrictId };
-
-// Real project data derived only from existing district fields
-const districtProjects: Array<{
-  id: string;
-  districtId: DistrictId;
-  name: string;
-  category: ProjectCategory;
-  shortDesc: string;
-  status: string;
-}> = [
-  {
-    id: 'PG-ML-01',
-    districtId: 'research',
-    name: 'Research Initiative',
-    category: 'ai-ml',
-    shortDesc: byId['research'].description,
-    status: 'ACTIVE',
-  },
-  {
-    id: 'PG-SW-01',
-    districtId: 'garage',
-    name: 'Project Garage',
-    category: 'software',
-    shortDesc: byId['garage'].description,
-    status: 'ACTIVE',
-  },
-  {
-    id: 'PG-SW-02',
-    districtId: 'hq',
-    name: 'AIRS Platform',
-    category: 'software',
-    shortDesc: byId['hq'].description,
-    status: 'ACTIVE',
-  },
-  {
-    id: 'PG-RB-01',
-    districtId: 'arena',
-    name: 'Event Arena',
-    category: 'open-source',
-    shortDesc: byId['arena'].description,
-    status: 'ACTIVE',
-  },
-  {
-    id: 'PG-OC-01',
-    districtId: 'crew',
-    name: 'Crew Network',
-    category: 'open-source',
-    shortDesc: byId['crew'].description,
-    status: 'ACTIVE',
-  },
-];
-
-const categoryLabels: Record<ProjectCategory, string> = {
-  'all':         'ALL',
-  'ai-ml':       'AI / ML',
-  'software':    'SOFTWARE',
-  'robotics':    'ROBOTICS',
-  'open-source': 'OPEN SOURCE',
-};
+const districtProjects = airsProjects;
 
 function ProjectsApp({ state, onLocate }: { state: WorldState; onLocate: (id: DistrictId) => void }) {
   const [activeFilter, setActiveFilter] = useState<ProjectCategory>('all');
@@ -881,7 +825,8 @@ function ProjectsApp({ state, onLocate }: { state: WorldState; onLocate: (id: Di
         {filtered.length === 0 ? (
           <div className="al-empty-state al-empty-state-lg">
             <span className="al-empty-code">PROJECT DATABASE</span>
-            <span className="al-empty-msg">No projects in this category</span>
+            <span className="al-empty-msg">{districtProjects.length === 0 ? 'No verified entries' : 'No projects in this category'}</span>
+            <span className="al-empty-sub">{districtProjects.length === 0 ? 'Verified engineering builds will appear here upon submission.' : 'Try selecting another category filter.'}</span>
           </div>
         ) : (
           filtered.map(proj => {
@@ -931,8 +876,6 @@ function ProjectsApp({ state, onLocate }: { state: WorldState; onLocate: (id: Di
 }
 
 // ── EVENTS APP ────────────────────────────────────────────────────────────────
-type EventCategory = 'upcoming' | 'hackathons' | 'workshops' | 'talks' | 'competitions' | 'past';
-
 function EventsApp() {
   const [activeTab, setActiveTab] = useState<EventCategory>('upcoming');
 
@@ -974,18 +917,19 @@ function EventsApp() {
 
 
 // ── Device shell ──────────────────────────────────────────────────────────────
-export function AirsLink({ state, travel, onClose, reduced, audioEnabled, intel, readIntel, markIntelRead }: Props) {
+export function AirsLink({ state, travel, onClose, reduced, audioEnabled, onToggleAudio, intel, readIntel, markIntelRead }: Props) {
   const deviceRef     = useRef<HTMLDivElement>(null);
   const backdropRef   = useRef<HTMLDivElement>(null);
   const previousFocus = useRef<HTMLElement | null>(null);
   const [activeApp, setActiveApp] = useState<AirsLinkAppId>('home');
   const [time, setTime]           = useState(() => new Date());
-  const [muted, setMuted]         = useState(() => audio.muted);
 
-  const toggleMute = () => {
-    const next = !muted;
-    audio.setMute(next);
-    setMuted(next);
+  const handleToggleAudio = () => {
+    if (onToggleAudio) {
+      onToggleAudio();
+    } else {
+      audio.setMute(!audio.muted);
+    }
   };
 
   useEffect(() => {
@@ -1107,15 +1051,22 @@ export function AirsLink({ state, travel, onClose, reduced, audioEnabled, intel,
         tabIndex={-1}
       >
         {/* ── Status bar ──────────────────────────────────────── */}
-        <div className="al-statusbar" aria-hidden="true">
-          <span className="al-sb-brand">AIRS<span>·</span>LINK</span>
-          <span className="al-sb-time">{hh}:{mm}</span>
+        <div className="al-statusbar">
+          <span className="al-sb-brand" aria-hidden="true">AIRS<span>·</span>LINK</span>
+          <span className="al-sb-time" aria-hidden="true">{hh}:{mm}</span>
           <div className="al-sb-right">
-            <button className="al-sb-mute" onClick={toggleMute} aria-label={muted ? 'Unmute audio' : 'Mute audio'}>
-              <Icon name={muted ? 'mute' : 'sound'} size={12}/>
+            <button
+              type="button"
+              className="al-sb-mute"
+              onClick={handleToggleAudio}
+              aria-label={audioEnabled ? 'Mute audio' : 'Unmute audio'}
+              aria-pressed={audioEnabled}
+            >
+              <Icon name={audioEnabled ? 'sound' : 'mute'} size={12}/>
+              <span className="al-sb-mute-label">{audioEnabled ? 'ON' : 'OFF'}</span>
             </button>
-            <span className="al-signal-bars sm"><i/><i/><i/><i/></span>
-            <span className="al-battery" role="presentation">
+            <span className="al-signal-bars sm" aria-hidden="true"><i/><i/><i/><i/></span>
+            <span className="al-battery" role="presentation" aria-hidden="true">
               <span className="al-battery-charge"/>
             </span>
           </div>
@@ -1174,20 +1125,4 @@ export function AirsLink({ state, travel, onClose, reduced, audioEnabled, intel,
 }
 
 // ── Trigger ───────────────────────────────────────────────────────────────────
-export function AirsLinkTrigger({ onClick, unreadCount }: { onClick: () => void; unreadCount: number }) {
-  return (
-    <button
-      className="al-trigger"
-      onClick={onClick}
-      aria-label={`Open AIRS LINK${unreadCount > 0 ? `, ${unreadCount} areas uncharted` : ''}`}
-    >
-      <span className="al-trigger-icon" aria-hidden="true">
-        <AirsMark/>
-      </span>
-      <span className="al-trigger-label">LINK</span>
-      {unreadCount > 0 && (
-        <span className="al-trigger-pip" aria-hidden="true"/>
-      )}
-    </button>
-  );
-}
+export { AirsLinkTrigger } from './AirsLinkTrigger';
