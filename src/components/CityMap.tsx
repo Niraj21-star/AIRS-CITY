@@ -284,7 +284,8 @@ export function CityMap({ state, dispatch, reduced, travel, onReady, airsLinkOpe
 
     // Fit maximum practical bounds of the master map into the safe viewing aperture
     const targetWidth = Math.min(availWidth, availHeight * mapAspect);
-    const fitScale = targetWidth / worldWidth;
+    // Multiply by 1.65 to zoom in more on the districts, rather than shrinking the entire map width into the viewport
+    const fitScale = (targetWidth / worldWidth) * 1.65;
 
     const centerX = width / 2;
     const centerY = topClearance + availHeight / 2;

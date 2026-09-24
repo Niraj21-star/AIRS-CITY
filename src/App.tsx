@@ -348,7 +348,7 @@ export function App() {
       </main>
       <footer className="world-footer"><div className="discovery-counter"><span className="discovery-bars">{districts.map(d => <i key={d.id} className={state.discovered.includes(d.id) ? 'filled' : ''}/>)}</span><span><strong>{String(state.discovered.length).padStart(2, '0')}</strong> / 05 <span className="discovered-word">DISTRICTS DISCOVERED</span></span></div><span className="map-instructions">{state.level === 'CITY' ? 'DRAG TO EXPLORE' : 'FOLLOW YOUR CURIOSITY'}<span>+</span>{state.level === 'CITY' ? 'SELECT A WAYPOINT' : 'ESC TO RETURN'}</span><button className="index-button" id="district-index" onClick={() => setOverlay('index')} disabled={state.isTransitioning}><Icon name="map" size={16}/>District index<span className="key-hint">05</span></button></footer>
       <button className="reference-badge" onClick={() => setOverlay('guide')}>AIRS CITY <span>/ SYSTEM GUIDE</span><span className="reference-dot"/></button>
-      <button className="teaser-launcher-badge" onClick={openTeaser} aria-label="Watch AIRS City launch teaser"><Icon name="play" size={12}/><span>Watch Teaser</span></button>
+
       {/* ── AIRS LINK trigger — persistent bottom-right HUD button ────────── */}
       <AirsLinkTrigger onClick={openAirsLink} unreadCount={airsLinkUnread} />
     </div>
