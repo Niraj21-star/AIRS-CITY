@@ -294,7 +294,11 @@ button:focus:not(:focus-visible),[tabindex='-1']:focus{outline:none}
 @media(max-width:759px){
   :root{--edge:22px}.airs-world{min-height:400px}.world-header{top:23px;height:38px;gap:14px}.wordmark{gap:9px}.wordmark>span{font-size:22px}.wordmark>span>span{font-size:8px;margin-top:5px}.airs-mark{width:31px;height:31px}.brand-caption,.header-divider,.header-coordinate,.city-status{display:none}.header-right{gap:17px}.audio-toggle{font-size:8px;gap:8px}.guide-button{border:0;width:30px}.world-footer{left:var(--edge);right:var(--edge);bottom:20px;height:35px;padding-top:12px;gap:8px}.discovery-counter{gap:8px;font-size:8px}.discovery-bars{gap:3px}.discovery-bars i{width:3px;height:10px}.discovered-word{font-size:6px;display:none}.index-button{font-size:8px;gap:7px;min-height:36px}.index-button .key-hint{display:none}.reference-badge{top:76px;left:var(--edge);right:auto;bottom:auto;font-size:6px;padding:0;min-height:16px}.reference-badge span:not(.reference-dot){display:none}
   .city-vignette{background:linear-gradient(180deg,#060b12e8 0%,#060b126e 16%,transparent 27%,transparent 51%,#060c16b0 68%,#060b12 90%)}
-  .city-editorial{top:111px;bottom:auto;pointer-events:none}.city-editorial>.eyebrow{font-size:7px;letter-spacing:.1em;gap:8px}.city-editorial .short-rule{width:18px}.city-editorial h1{font-size:40px;letter-spacing:-.06em;margin:10px 0 9px}.city-tagline{font-size:10px}.compass{left:auto;right:var(--edge);top:121px}.compass>span{font-size:8px}.compass>svg{width:37px;height:37px}.compass small{display:none}.map-legend{display:none}.geographic-label{display:none}.map-tools{right:var(--edge);top:38%;border-color:#b0c4cf30}.map-tools button{width:35px;height:35px}.map-tools>span{font-size:8px;padding:2px}.waypoint{min-height:48px}.waypoint-symbol{width:46px;height:46px}.waypoint-name{font-size:14px}.waypoint.selected .waypoint-name{font-size:17px}.waypoint.selected:after{width:62px;height:62px;top:calc(50% - 31px)}.waypoint-code{font-size:8px}.marker-status{font-size:6px}.waypoint:not(.selected){opacity:.6}.waypoint-enter{font-size:8px}
+  .city-editorial{top:74px;bottom:auto;pointer-events:none}.city-editorial>.eyebrow{font-size:7px;letter-spacing:.1em;gap:8px}.city-editorial .short-rule{width:18px}.city-editorial h1{font-size:26px;letter-spacing:-.05em;margin:4px 0 3px}.city-tagline{font-size:9px;opacity:.7}.compass{left:auto;right:var(--edge);top:115px}.compass>span{font-size:8px}.compass>svg{width:34px;height:34px}.compass small{display:none}.map-legend{display:none}.geographic-label{display:none}.map-tools{right:var(--edge);top:34%;border-color:#b0c4cf30}.map-tools button{width:35px;height:35px}.map-tools>span{font-size:8px;padding:2px}.waypoint{min-height:56px}.waypoint:before{min-width:58px;min-height:58px;inset:-10px -8px}.waypoint-symbol{width:46px;height:46px;flex-shrink:0}.waypoint-name{font-size:14px}.waypoint.selected .waypoint-name{font-size:17px}.waypoint.selected:after{width:62px;height:62px;top:calc(50% - 31px)}.waypoint-code{font-size:8px}.marker-status{font-size:6px}.waypoint:not(.selected){opacity:.92}.waypoint-enter{font-size:8px}
+  .waypoint--east{transform:translate(calc(-100% + 23px),-23px) scale(var(--marker-scale));transform-origin:calc(100% - 23px) 23px;flex-direction:row-reverse;text-align:right}
+  .waypoint--east .waypoint-label{align-items:flex-end}
+  .waypoint--east .waypoint-enter{flex-direction:row-reverse}
+  .waypoint--east.selected:after{left:auto;right:-8px}
   .destination-preview{left:var(--edge);right:var(--edge);width:auto;bottom:143px;padding:13px 0 0 14px;background:linear-gradient(90deg,#0b182499,transparent)}.preview-top .eyebrow{font-size:7px}.preview-number{font-size:8px}.destination-preview h2{font-size:21px;margin:8px 0 8px}.destination-preview>p{font-size:11px}.destination-preview .text-action{min-height:41px;margin-top:11px;font-size:9px}.preview-mission{font-size:8px;margin-bottom:6px}.mobile-districts{position:absolute;left:var(--edge);right:var(--edge);bottom:66px;display:flex;justify-content:space-between;gap:7px}.mobile-districts>button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;width:54px;min-height:56px;padding:7px 3px;color:#859ba9;border-top:1px solid #d7e6e128;background:#08121b66;font:8px var(--mono)}.mobile-districts>button>svg{width:19px;height:19px}.mobile-districts>button.active{color:var(--accent);border-top-color:var(--accent);background:#edbb770a}
   .district-heading{top:119px}.district-heading>.eyebrow{font-size:7px;margin-bottom:10px}.district-heading>div{font-size:8px;gap:10px}.scene-copy>p{top:27%;font-size:8px}.scene-copy>h1{top:32%;font-size:36px;max-width:calc(100% - 44px);line-height:1.17}.environment-reticle{left:73%;top:20%;width:44px;height:44px}.environment-reticle>div svg{width:19px}.environment-reticle small{display:none}.mission-brief{right:var(--edge);left:var(--edge);width:auto;bottom:270px;padding-top:17px;gap:16px}.mission-index{font-size:29px}.mission-brief h2{font-size:22px;margin:4px 0 7px}.mission-brief p:last-child{font-size:11px}.mission-brief .eyebrow{font-size:7px}.scene-copy>.primary-action{left:var(--edge);right:var(--edge);width:calc(100% - 44px);bottom:196px;min-height:49px;font-size:9px}.minimap{left:var(--edge);bottom:68px;width:150px;padding:4px}.minimap-image{height:63px}.minimap-caption{font-size:7px;padding:7px 4px 4px}.minimap-return{font-size:7px;padding:3px 4px 4px}.scene-coordinate{display:flex;left:192px;right:20px;bottom:90px;font-size:7px;line-height:1.6}.scene-coordinate>span:last-child{font-size:6px}.scene-vignette{background:linear-gradient(0deg,#070f19 1%,#07111adb 26%,#07111a32 68%,#071019e0),linear-gradient(90deg,#080f1a70,transparent 90%)}
   .content-sheet{width:100%}.content-header{padding:21px 24px}.content-body{padding:26px 24px 28px}.content-header .eyebrow{font-size:7px}.content-heading{font-size:20px}.chapter-tabs{gap:24px;margin-bottom:29px}.chapter-tabs>button{font-size:8px}.chapter-progress{margin-bottom:24px}.chapter-content>h2,.editorial-empty>h2,.section-statement{font-size:37px}.chapter-description{font-size:14px;line-height:1.85}.chapter-footnote{font-size:11px}.content-footer{padding:12px 20px;font-size:7px}.content-footer button{font-size:8px}.mission-complete>h2{font-size:39px}.content-body>.primary-action{margin-top:28px}.dossier{gap:17px}.dossier-photo{width:84px;height:125px}.dossier h3{font-size:19px}.dossier p:not(.eyebrow){font-size:11px}.crew-roles>button{font-size:10px}.build-slot{gap:19px;padding:20px 16px;min-height:170px}.build-wireframe{width:83px;height:85px}.build-wireframe>svg{width:45px}.build-slot h3{font-size:23px}.build-slot .eyebrow{font-size:7px}
@@ -760,14 +764,108 @@ button:focus:not(:focus-visible),[tabindex='-1']:focus{outline:none}
 .al-home-row{border-top:1px solid var(--al-border);padding-top:11px;}
 .al-home-row-last{padding-bottom:4px;}
 
-/* Discovery */
-.al-home-discovery{display:flex;align-items:center;justify-content:space-between;gap:10px;}
-.al-disc-track{display:flex;gap:5px;}
-.al-disc-count{
-  font-family:var(--al-mono);font-size:10px;color:var(--al-muted);
-  white-space:nowrap;
+/* Telemetry Status Badge */
+.al-home-status-badge {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: rgba(125,199,138,0.08);
+  border: 1px solid rgba(125,199,138,0.2);
+  padding: 4px 8px;
+  border-radius: 5px;
 }
-.al-disc-count strong{font-weight:400;font-size:13px;color:var(--al-text);}
+.al-status-text {
+  display: flex;
+  flex-direction: column;
+}
+.al-status-label {
+  font-family: var(--al-mono);
+  font-size: 6.5px;
+  letter-spacing: 0.14em;
+  color: var(--al-dim);
+}
+.al-status-val {
+  font-family: var(--al-mono);
+  font-size: 8px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--al-green);
+}
+
+/* Primary Contextual Action Card */
+.al-home-action-row {
+  margin-top: 2px;
+}
+.al-contextual-card {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: linear-gradient(135deg, rgba(237,187,119,0.12) 0%, rgba(10,22,33,0.85) 100%);
+  border: 1px solid rgba(237,187,119,0.35);
+  border-radius: 9px;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.2s, border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.3);
+}
+.al-contextual-card:hover {
+  background: linear-gradient(135deg, rgba(237,187,119,0.2) 0%, rgba(14,28,42,0.95) 100%);
+  border-color: rgba(237,187,119,0.6);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 22px rgba(237,187,119,0.15);
+}
+.al-contextual-card:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 2px;
+}
+.al-contextual-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: rgba(237,187,119,0.15);
+  border: 1px solid rgba(237,187,119,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--amber);
+  flex-shrink: 0;
+}
+.al-contextual-content {
+  flex: 1;
+  min-width: 0;
+}
+.al-contextual-title {
+  display: block;
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #fff;
+  line-height: 1.2;
+}
+.al-contextual-desc {
+  display: block;
+  font-family: var(--al-mono);
+  font-size: 8px;
+  letter-spacing: 0.06em;
+  color: #9ab0ba;
+  margin-top: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.al-contextual-arrow {
+  color: var(--amber);
+  opacity: 0.8;
+  transition: transform 0.2s;
+  flex-shrink: 0;
+}
+.al-contextual-card:hover .al-contextual-arrow {
+  transform: translateX(3px);
+  opacity: 1;
+}
 
 /* Active mission card */
 .al-home-mission-card{
@@ -797,7 +895,7 @@ button:focus:not(:focus-visible),[tabindex='-1']:focus{outline:none}
 }
 
 /* Quick launch */
-.al-home-quicklaunch{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;}
+.al-home-quicklaunch{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;}
 .al-ql-btn{
   display:flex;flex-direction:column;align-items:center;gap:7px;
   padding:12px 6px;
@@ -3042,11 +3140,26 @@ button:focus:not(:focus-visible),[tabindex='-1']:focus{outline:none}
   text-transform: uppercase;
 }
 
-/* ── Scene 2: Identity ── */
+/* ── Scene 1: Identity ── */
 .scene-identity .teaser-emblem {
   transform: scale(2.2);
-  margin-bottom: 48px;
+  margin-bottom: 36px;
   filter: drop-shadow(0 0 30px rgba(237,187,119,0.45));
+}
+
+.teaser-identity-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 680px;
+}
+
+.teaser-gold-tag {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  color: var(--amber);
+  margin-bottom: 14px;
 }
 
 .teaser-statement {
@@ -3070,10 +3183,164 @@ button:focus:not(:focus-visible),[tabindex='-1']:focus{outline:none}
   color: #f5f8fa;
 }
 
-.statement-accent {
-  font-size: clamp(40px, 6.8vw, 84px);
+.teaser-identity-body {
+  margin-top: 24px;
+  font-size: clamp(14px, 1.8vw, 18px);
+  color: #9cb1bd;
+  line-height: 1.6;
+  max-width: 580px;
+  letter-spacing: -0.01em;
+}
+
+/* ── Scene 2: What AIRS Explores ── */
+.scene-explores {
+  max-width: 1040px;
+  width: 92%;
+  margin: 0 auto;
+}
+
+.teaser-explores-header {
+  margin-bottom: 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.teaser-blue-tag {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  color: #64b5f6;
+  margin-bottom: 8px;
+}
+
+.teaser-section-title {
+  font-size: clamp(26px, 4.2vw, 48px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
   color: #fff;
-  text-shadow: 0 0 40px rgba(255,255,255,0.3);
+  margin: 0;
+}
+
+.teaser-section-sub {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: #8c9fa8;
+  margin-top: 6px;
+}
+
+.teaser-domains-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+  width: 100%;
+}
+
+.teaser-domain-card {
+  background: rgba(8, 18, 28, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 16px 14px;
+  text-align: left;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.teaser-domain-card:hover {
+  background: rgba(14, 28, 42, 0.85);
+  border-color: rgba(100, 181, 246, 0.4);
+}
+
+.teaser-domain-code {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: #64b5f6;
+}
+
+.teaser-domain-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.teaser-domain-name {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: #f0f4f7;
+  line-height: 1.25;
+  margin: 0;
+}
+
+.teaser-domain-detail {
+  font-size: 10px;
+  line-height: 1.45;
+  color: #8096a2;
+  margin: 0;
+}
+
+/* ── Scene 3: What AIRS Builds ── */
+.scene-builds {
+  max-width: 720px;
+  width: 90%;
+  margin: 0 auto;
+}
+
+.teaser-builds-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.teaser-orange-tag {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  color: var(--amber);
+  margin-bottom: 12px;
+}
+
+.teaser-builds-title {
+  font-size: clamp(32px, 5.4vw, 68px);
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  color: #c0d1db;
+  margin: 0;
+}
+
+.teaser-builds-title strong {
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 0 35px rgba(237, 187, 119, 0.35);
+}
+
+.teaser-builds-body {
+  margin-top: 24px;
+  font-size: clamp(14px, 1.8vw, 18px);
+  color: #9cb1bd;
+  line-height: 1.6;
+  max-width: 580px;
+  letter-spacing: -0.01em;
+}
+
+.teaser-builds-foot {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  color: #728793;
+  margin-top: 32px;
 }
 
 /* ── Scene 3: Manifest ── */
@@ -3504,6 +3771,32 @@ button:focus:not(:focus-visible),[tabindex='-1']:focus{outline:none}
   }
   .teaser-footer {
     display: none;
+  }
+  .teaser-domains-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    max-height: 52vh;
+    overflow-y: auto;
+    padding-right: 4px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .teaser-domain-card {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 10px 12px;
+  }
+  .teaser-domain-detail {
+    font-size: 9.5px;
+  }
+  .teaser-builds-foot {
+    gap: 8px;
+    font-size: 8.5px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .al-home-quicklaunch {
+    grid-template-columns: repeat(2, 1fr);
   }
   .climax-actions {
     flex-direction: column;

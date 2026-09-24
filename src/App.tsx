@@ -42,8 +42,12 @@ export function App() {
   const [reduced, setReduced] = useState(() => matchMedia('(prefers-reduced-motion: reduce)').matches);
   const [notice, setNotice] = useState('');
   const [persistentStorage, setPersistentStorage] = useState(true);
+  // Fresh page load always opens on #/teaser unless opening developer preview
   const [isTeaser, setIsTeaser] = useState(() => {
-    return location.hash === '#/teaser' || location.pathname.endsWith('/teaser');
+    if (import.meta.env.DEV && (location.hash === '#/dev/content' || location.pathname.endsWith('/dev/content'))) {
+      return false;
+    }
+    return true;
   });
   const [isDevPreview, setIsDevPreview] = useState(() => {
     return Boolean(import.meta.env.DEV && (location.hash === '#/dev/content' || location.pathname.endsWith('/dev/content')));
@@ -51,6 +55,17 @@ export function App() {
   const routeInitialized = useRef(false);
   const district = state.district ? byId[state.district] : null;
   const modal = !isTeaser && (!!overlay || state.level === 'CONTENT');
+
+  // Sync hash to #/teaser on initial load if teaser is active
+  useEffect(() => {
+    if (isTeaser && location.hash !== '#/teaser' && !isDevPreview) {
+      try {
+        history.replaceState(null, '', '#/teaser');
+      } catch {
+        location.hash = '#/teaser';
+      }
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const openTeaser = () => {
     location.hash = '#/teaser';
@@ -61,8 +76,11 @@ export function App() {
     setIsTeaser(false);
     location.hash = '#/city';
     dispatch({ type: 'ROUTE', route: { level: 'CITY', district: null } });
-    if (!state.introComplete) {
-      dispatch({ type: 'INTRO_COMPLETE' });
+    dispatch({ type: 'INTRO_COMPLETE' });
+    try {
+      sessionStorage.setItem('airs-city-intro', 'complete');
+    } catch {
+      // Storage unavailable
     }
     if (!state.audioEnabled && !audio.muted) {
       dispatch({ type: 'AUDIO', enabled: true });
@@ -241,7 +259,7 @@ export function App() {
     if (!state.introComplete || state.isTransitioning || state.level === 'CONTENT') return;
     const timer = setTimeout(() => {
       if (state.level === 'DISTRICT') document.querySelector<HTMLElement>('#district-title')?.focus({ preventScroll: true });
-      else if (state.discovered.length) document.querySelector<HTMLElement>('.destination-preview .text-action')?.focus({ preventScroll: true });
+      else if (state.discovered.length) document.querySelector<HTMLElement>('.waypoint.selected')?.focus({ preventScroll: true });
     }, 60);
     return () => clearTimeout(timer);
   }, [state.level, state.district, state.introComplete, state.isTransitioning]);

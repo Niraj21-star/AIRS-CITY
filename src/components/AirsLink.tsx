@@ -70,7 +70,6 @@ function HomeApp({ state, onNav, unreadCount }: { state: WorldState; onNav: (app
   const hh = time.getHours().toString().padStart(2, '0');
   const mm = time.getMinutes().toString().padStart(2, '0');
   const ss = time.getSeconds().toString().padStart(2, '0');
-  const discovered = state.discovered.length;
 
   let missionLabel = '—';
   let missionSub   = 'No active mission';
@@ -86,77 +85,98 @@ function HomeApp({ state, onNav, unreadCount }: { state: WorldState; onNav: (app
     missionActive = false;
   }
 
-  let contextualAction = null;
-  if (state.district && state.level === 'DISTRICT') {
-    const actionMap: Record<string, { label: string, app: AirsLinkAppId, icon: any }> = {
-      hq: { label: 'View AIRS ID', app: 'id', icon: 'id' },
-      research: { label: 'Access Research Database', app: 'research', icon: 'map' },
-      garage: { label: 'Access Project Logs', app: 'projects', icon: 'target' },
-      arena: { label: 'Access Event Archive', app: 'events', icon: 'arena' },
-      crew: { label: 'Access Personnel Registry', app: 'crew', icon: 'crew' },
-    };
-    const ctx = actionMap[state.district];
-    if (ctx) {
-      contextualAction = (
-        <div className="al-home-row">
-          <span className="al-eyebrow-label">Location Context</span>
-          <button className="al-contextual-action" onClick={() => onNav(ctx.app)}>
-            <span>{ctx.label}</span>
-            <Icon name={ctx.icon} size={14} />
-          </button>
-        </div>
-      );
+  type ContextualAction = {
+    label: string;
+    app: AirsLinkAppId;
+    icon: Parameters<typeof Icon>[0]['name'];
+    desc: string;
+  };
+
+  // Primary contextual action derived from current location
+  const getContextualAction = (): ContextualAction => {
+    if (state.district) {
+      const map: Record<DistrictId, ContextualAction> = {
+        hq:       { label: 'OPEN AIRS ID',  app: 'id',       icon: 'target', desc: 'Inspect personal credentials and origin protocol' },
+        research: { label: 'OPEN RESEARCH', app: 'research', icon: 'map',    desc: 'Explore canonical research domains and active papers' },
+        garage:   { label: 'OPEN PROJECTS', app: 'projects', icon: 'arrow',  desc: 'Inspect working prototypes, systems, and open repos' },
+        arena:    { label: 'OPEN EVENTS',   app: 'events',   icon: 'arena',  desc: 'View hackathons, summits, and gathering schedule' },
+        crew:     { label: 'OPEN CREW',     app: 'crew',     icon: 'crew',   desc: 'Browse researcher network and contributor graph' },
+      };
+      return map[state.district];
     }
-  }
+    return {
+      label: 'EXPLORE CITY MAP',
+      app: 'city',
+      icon: 'map',
+      desc: 'Access district GPS coordinates and world travel',
+    };
+  };
+
+  const action = getContextualAction();
 
   return (
     <div className="al-app al-app-home">
+      {/* ── 1. Current Location Hero ────────────────────────── */}
       <div className="al-home-hero">
         <div className="al-home-hero-eyebrow">
           <span className={`al-status-dot ${state.district ? 'active' : ''}`} />
-          <span>Current location</span>
+          <span>CURRENT LOCATION</span>
         </div>
         <div className="al-home-hero-name">{locationLabel(state)}</div>
         <div className="al-home-hero-meta">
-          <span className="al-home-hero-sector">{locationSector(state)}</span>
+          <span className="al-home-hero-sector">SECTOR {locationSector(state)}</span>
           <span className="al-home-hero-sep" aria-hidden="true">·</span>
           <span className="al-home-hero-level">{state.level === 'CITY' ? 'CITY MAP' : state.level}</span>
         </div>
       </div>
 
+      {/* ── 2. System Status & Telemetry Strip ──────────────── */}
       <div className="al-home-strip">
         <div className="al-home-clock">
           <span className="al-home-clock-hm">{hh}<span className="al-colon">:</span>{mm}</span>
           <span className="al-home-clock-s">{ss}</span>
-          <span className="al-home-clock-label">LOCAL</span>
+          <span className="al-home-clock-label">SYS // LOCAL</span>
+        </div>
+        <div className="al-home-status-badge">
+          <span className="al-status-dot active" />
+          <div className="al-status-text">
+            <span className="al-status-label">STATUS</span>
+            <span className="al-status-val">NOMINAL</span>
+          </div>
         </div>
         <div className="al-home-net">
           <span className="al-signal-bars"><i/><i/><i/><i/></span>
-          <span className="al-home-net-label">SIGNAL<br/>ACTIVE</span>
+          <span className="al-home-net-label">CARRIER<br/>LOCKED</span>
         </div>
       </div>
 
-      <div className="al-home-row">
-        <span className="al-eyebrow-label">Network discovery</span>
-        <div className="al-home-discovery">
-          <div className="al-disc-track">
-            {districts.map(d => (
-              <span
-                key={d.id}
-                className={`al-disc-pip ${state.discovered.includes(d.id) ? 'on' : ''}`}
-                style={{ '--pip': d.accent } as CSSProperties}
-                title={d.name}
-              />
-            ))}
-          </div>
-          <span className="al-disc-count">
-            <strong>{discovered}</strong>/5
-          </span>
+      {/* ── 3. Primary Contextual Action (Elevated) ─────────── */}
+      {action && (
+        <div className="al-home-row al-home-action-row">
+          <span className="al-eyebrow-label">PRIMARY CONTEXTUAL ACTION</span>
+          <button
+            type="button"
+            className="al-contextual-card"
+            onClick={() => onNav(action.app)}
+            aria-label={`${action.label} - ${action.desc}`}
+          >
+            <div className="al-contextual-icon">
+              <Icon name={action.icon} size={18} />
+            </div>
+            <div className="al-contextual-content">
+              <span className="al-contextual-title">{action.label}</span>
+              <span className="al-contextual-desc">{action.desc}</span>
+            </div>
+            <div className="al-contextual-arrow" aria-hidden="true">
+              <Icon name="arrow" size={14} />
+            </div>
+          </button>
         </div>
-      </div>
+      )}
 
+      {/* ── 4. Mission / Directive ──────────────────────────── */}
       <div className="al-home-row">
-        <span className="al-eyebrow-label">Active mission</span>
+        <span className="al-eyebrow-label">SYSTEM DIRECTIVE</span>
         <div className={`al-home-mission-card ${missionActive ? 'active' : ''}`}>
           <span className={`al-status-dot ${missionActive ? 'active' : 'idle'}`} />
           <div className="al-home-mission-body">
@@ -169,24 +189,27 @@ function HomeApp({ state, onNav, unreadCount }: { state: WorldState; onNav: (app
         </div>
       </div>
 
-      {contextualAction}
-
+      {/* ── 5. Quick Access Shortcuts ───────────────────────── */}
       <div className="al-home-row al-home-row-last">
-        <span className="al-eyebrow-label">Quick access</span>
+        <span className="al-eyebrow-label">QUICK ACCESS</span>
         <div className="al-home-quicklaunch">
-          <button className="al-ql-btn" onClick={() => onNav('intel')}>
+          <button type="button" className="al-ql-btn" onClick={() => onNav('city')}>
+            <div className="al-ql-icon"><Icon name="map" size={17} /></div>
+            <span>City GPS</span>
+          </button>
+          <button type="button" className="al-ql-btn" onClick={() => onNav('intel')}>
             <div className="al-ql-icon">
-              <Icon name="hq" size={17} />
+              <Icon name="target" size={17} />
               {unreadCount > 0 && <span className="al-unread-pip" />}
             </div>
             <span>Intel</span>
           </button>
-          <button className="al-ql-btn" onClick={() => onNav('research')}>
+          <button type="button" className="al-ql-btn" onClick={() => onNav('research')}>
             <div className="al-ql-icon"><Icon name="map" size={17} /></div>
             <span>Research</span>
           </button>
-          <button className="al-ql-btn" onClick={() => onNav('projects')}>
-            <div className="al-ql-icon"><Icon name="target" size={17} /></div>
+          <button type="button" className="al-ql-btn" onClick={() => onNav('projects')}>
+            <div className="al-ql-icon"><Icon name="arrow" size={17} /></div>
             <span>Projects</span>
           </button>
         </div>

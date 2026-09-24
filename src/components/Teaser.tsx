@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { cityAsset } from '../data/assets';
 import { districts } from '../data/districts';
+import { airsResearchDomains } from '../data/research';
 import { AirsMark, Icon } from './Icon';
 import { audio } from '../audio';
 import cityBgmUrl from '../assets/audio/Midnight_Over_the_Metropolis.mp3';
@@ -33,7 +34,7 @@ export function Teaser({ onEnterCity, reduced, audioEnabled, onToggleAudio }: Te
   const handleSkip = () => {
     startSoundtrack();
     if (timelineRef.current) timelineRef.current.kill();
-    setPhase(6);
+    setPhase(7);
   };
 
   // Replay sequence safely without reloading or creating duplicate engines
@@ -45,8 +46,8 @@ export function Teaser({ onEnterCity, reduced, audioEnabled, onToggleAudio }: Te
   // Progress through teaser sequence using GSAP
   useEffect(() => {
     if (reduced) {
-      // Under reduced motion: directly present clear sequence with minimal delay
-      const t = setTimeout(() => setPhase(6), 1800);
+      // Under reduced motion: directly present final actionable state with minimal delay
+      const t = setTimeout(() => setPhase(7), 1600);
       return () => clearTimeout(t);
     }
 
@@ -56,23 +57,26 @@ export function Teaser({ onEnterCity, reduced, audioEnabled, onToggleAudio }: Te
     timelineRef.current = tl;
 
     if (phase === 0) {
-      // Phase 0: Cold start -> Phase 1
-      tl.to({}, { duration: 1.8, onComplete: () => setPhase(1) });
+      // Phase 0: Signal Detected -> Phase 1
+      tl.to({}, { duration: 2.2, onComplete: () => setPhase(1) });
     } else if (phase === 1) {
-      // Phase 1: System activity -> Phase 2
-      tl.to({}, { duration: 2.2, onComplete: () => setPhase(2) });
+      // Phase 1: Identity & Community -> Phase 2
+      tl.to({}, { duration: 3.4, onComplete: () => setPhase(2) });
     } else if (phase === 2) {
-      // Phase 2: AIRS Identity -> Phase 3
-      tl.to({}, { duration: 2.8, onComplete: () => setPhase(3) });
+      // Phase 2: What AIRS Explores (Research Domains) -> Phase 3
+      tl.to({}, { duration: 4.4, onComplete: () => setPhase(3) });
     } else if (phase === 3) {
-      // Phase 3: Manifest -> Phase 4
-      tl.to({}, { duration: 3.2, onComplete: () => setPhase(4) });
+      // Phase 3: What AIRS Builds (Engineering & Systems) -> Phase 4
+      tl.to({}, { duration: 3.4, onComplete: () => setPhase(4) });
     } else if (phase === 4) {
-      // Phase 4: Master City Reveal -> Phase 5
-      tl.to({}, { duration: 4.4, onComplete: () => setPhase(5) });
+      // Phase 4: The City (Concept) -> Phase 5
+      tl.to({}, { duration: 3.2, onComplete: () => setPhase(5) });
     } else if (phase === 5) {
-      // Phase 5: AIRS LINK Reveal -> Phase 6
-      tl.to({}, { duration: 3.6, onComplete: () => setPhase(6) });
+      // Phase 5: Master City Reveal (Map + 5 Districts) -> Phase 6
+      tl.to({}, { duration: 4.6, onComplete: () => setPhase(6) });
+    } else if (phase === 6) {
+      // Phase 6: AIRS LINK (Interface Reveal) -> Phase 7
+      tl.to({}, { duration: 3.6, onComplete: () => setPhase(7) });
     }
 
     return () => {
@@ -87,10 +91,10 @@ export function Teaser({ onEnterCity, reduced, audioEnabled, onToggleAudio }: Te
         e.preventDefault();
         handleSkip();
       } else if (e.key === 'Enter' || e.key === ' ') {
-        if (phase < 6) {
+        if (phase < 7) {
           e.preventDefault();
           startSoundtrack();
-          setPhase(prev => Math.min(6, prev + 1));
+          setPhase(prev => Math.min(7, prev + 1));
         }
       }
     };
@@ -100,8 +104,8 @@ export function Teaser({ onEnterCity, reduced, audioEnabled, onToggleAudio }: Te
 
   const handleStageClick = () => {
     startSoundtrack();
-    if (phase < 6) {
-      setPhase(prev => Math.min(6, prev + 1));
+    if (phase < 7) {
+      setPhase(prev => Math.min(7, prev + 1));
     }
   };
 
@@ -117,7 +121,7 @@ export function Teaser({ onEnterCity, reduced, audioEnabled, onToggleAudio }: Te
         <div className="teaser-brand">
           <AirsMark />
           <span>AIRS<span>CITY</span></span>
-          <span className="teaser-tag">LAUNCH TEASER // 001</span>
+          <span className="teaser-tag">EXPERIENCE TEASER // 001</span>
         </div>
         <div className="teaser-controls">
           <button
@@ -134,12 +138,12 @@ export function Teaser({ onEnterCity, reduced, audioEnabled, onToggleAudio }: Te
             <span>SOUND {audioEnabled ? 'ON' : 'OFF'}</span>
           </button>
 
-          {phase < 6 && (
+          {phase < 7 && (
             <button
               type="button"
               className="teaser-skip-btn"
               onClick={handleSkip}
-              aria-label="Skip to action and enter city"
+              aria-label="Skip directly to city entry"
             >
               SKIP TO ACTION <Icon name="arrow" size={12} />
             </button>
@@ -149,40 +153,94 @@ export function Teaser({ onEnterCity, reduced, audioEnabled, onToggleAudio }: Te
 
       {/* ── Central Cinematic Stage ───────────────────────────────────── */}
       <main className="teaser-stage" onClick={handleStageClick}>
-        {/* PHASE 0 & 1: COLD START & SYSTEM ACTIVITY */}
-        {(phase === 0 || phase === 1) && (
-          <div className="teaser-scene scene-system" key="scene-system">
+        {/* PHASE 0: SIGNAL DETECTED */}
+        {phase === 0 && (
+          <div className="teaser-scene scene-system" key="scene-signal">
             <div className="teaser-hud-grid" aria-hidden="true" />
             <div className="teaser-terminal">
               <span className="terminal-header">SYS // PROTOCOL 001</span>
-              <span className="terminal-signal">SIGNAL ACQUISITION IN PROGRESS</span>
+              <span className="terminal-signal">SIGNAL DETECTED</span>
               <div className="terminal-divider" />
               <p className="terminal-log">
-                AIRS METROPOLIS DATA FEED .......... <em>LOCATED</em><br />
-                DISTRICT COORDINATES ............... <em>SYNCHRONIZED</em><br />
-                WORLD STATUS ....................... <em>READY FOR REVEAL</em>
+                NODE CARRIER ....................... <em>LOCKED</em><br />
+                DATASTREAM INTEGRITY ............... <em>99.98%</em><br />
+                TRANSMISSION TARGET ................ <em>AIRS ARCHIVE</em>
               </p>
             </div>
-            <span className="teaser-hint">CLICK OR PRESS SPACE TO ADVANCE</span>
+            <span className="teaser-hint">TAP OR PRESS SPACE TO ADVANCE</span>
           </div>
         )}
 
-        {/* PHASE 2: AIRS IDENTITY */}
-        {phase === 2 && (
+        {/* PHASE 1: IDENTITY */}
+        {phase === 1 && (
           <div className="teaser-scene scene-identity" key="scene-identity">
             <div className="teaser-emblem">
               <AirsMark />
             </div>
-            <h1 className="teaser-statement">
-              <span className="statement-sub">AIRS</span>
-              <span className="statement-main">IS BUILDING<br />SOMETHING DIFFERENT.</span>
-              <span className="statement-accent">A CITY.</span>
-            </h1>
+            <div className="teaser-identity-block">
+              <span className="eyebrow teaser-gold-tag">ORGANIZATIONAL MANIFEST</span>
+              <h1 className="teaser-statement">
+                <span className="statement-sub">AIRS</span>
+                <span className="statement-main">ARTIFICIAL INTELLIGENCE<br />RESEARCH SOCIETY</span>
+              </h1>
+              <p className="teaser-identity-body">
+                A community built around research, experimentation, engineering, and ideas.
+                Where curiosity becomes working technology.
+              </p>
+            </div>
           </div>
         )}
 
-        {/* PHASE 3: MANIFEST */}
+        {/* PHASE 2: WHAT AIRS EXPLORES (RESEARCH) */}
+        {phase === 2 && (
+          <div className="teaser-scene scene-explores" key="scene-explores">
+            <div className="teaser-explores-header">
+              <span className="eyebrow teaser-blue-tag">CANONICAL RESEARCH ATLAS</span>
+              <h2 className="teaser-section-title">WHAT AIRS EXPLORES.</h2>
+              <p className="teaser-section-sub">
+                Five active inquiry frontiers grounded in real problems:
+              </p>
+            </div>
+            <div className="teaser-domains-grid">
+              {airsResearchDomains.map(d => (
+                <div key={d.code} className="teaser-domain-card">
+                  <div className="teaser-domain-code">{d.code}</div>
+                  <div className="teaser-domain-body">
+                    <h3 className="teaser-domain-name">{d.name}</h3>
+                    <p className="teaser-domain-detail">{d.detail}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* PHASE 3: WHAT AIRS BUILDS */}
         {phase === 3 && (
+          <div className="teaser-scene scene-builds" key="scene-builds">
+            <div className="teaser-builds-content">
+              <span className="eyebrow teaser-orange-tag">ENGINEERING &amp; SYSTEMS</span>
+              <h2 className="teaser-builds-title">
+                PROOF BEATS<br />
+                <strong>POSSIBILITY.</strong>
+              </h2>
+              <p className="teaser-builds-body">
+                Turning curiosity into prototypes, experiments, open-source software, and shared gatherings.
+                Learn deeply. Experiment openly. Build deliberately.
+              </p>
+              <div className="teaser-builds-foot">
+                <span>VERIFIED BUILDS</span>
+                <span className="pillar-dot">·</span>
+                <span>OPEN DISCOVERY</span>
+                <span className="pillar-dot">·</span>
+                <span>HONEST LIMITATIONS</span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* PHASE 4: THE CITY CONCEPT */}
+        {phase === 4 && (
           <div className="teaser-scene scene-manifest" key="scene-manifest">
             <span className="teaser-badge-label">A DIGITAL WORLD FOR</span>
             <div className="teaser-manifest-pillars">
@@ -201,8 +259,8 @@ export function Teaser({ onEnterCity, reduced, audioEnabled, onToggleAudio }: Te
           </div>
         )}
 
-        {/* PHASE 4: CITY REVEAL */}
-        {phase === 4 && (
+        {/* PHASE 5: MASTER CITY REVEAL */}
+        {phase === 5 && (
           <div className="teaser-scene scene-city" key="scene-city">
             <div className="teaser-city-viewport">
               <img
@@ -235,8 +293,8 @@ export function Teaser({ onEnterCity, reduced, audioEnabled, onToggleAudio }: Te
           </div>
         )}
 
-        {/* PHASE 5: AIRS LINK REVEAL */}
-        {phase === 5 && (
+        {/* PHASE 6: AIRS LINK REVEAL */}
+        {phase === 6 && (
           <div className="teaser-scene scene-link" key="scene-link">
             <div className="teaser-device-silhouette">
               <div className="device-header">
@@ -268,24 +326,24 @@ export function Teaser({ onEnterCity, reduced, audioEnabled, onToggleAudio }: Te
             <div className="teaser-device-copy">
               <span className="eyebrow">PORTABLE OPERATING SYSTEM</span>
               <h3>AIRS LINK</h3>
-              <p>Your handheld device for navigation, intel, dossiers, and missions.</p>
+              <p>The handheld interface to decode, inspect, and navigate the city.</p>
             </div>
           </div>
         )}
 
-        {/* PHASE 6: CLIMAX & CTA */}
-        {phase === 6 && (
+        {/* PHASE 7: CLIMAX & FINAL CTA */}
+        {phase === 7 && (
           <div className="teaser-scene scene-climax" key="scene-climax">
             <div className="climax-atmosphere" aria-hidden="true" />
             <div className="climax-content">
-              <span className="eyebrow climax-eyebrow">OFFICIAL EXPERIENCE TEASER</span>
+              <span className="eyebrow climax-eyebrow">AIRS CITY // VERSION 1.0</span>
               <h1 className="climax-title">
                 YOU DON'T BROWSE IT.<br />
                 <span>YOU EXPLORE IT.</span>
               </h1>
               <p className="climax-sub">
-                THE WORLD IS BEING BUILT.<br />
-                <strong>AIRS CITY.</strong>
+                A LIVING DIGITAL WORLD.<br />
+                <strong>STEP INSIDE AIRS CITY.</strong>
               </p>
 
               <div className="climax-actions">
@@ -311,7 +369,7 @@ export function Teaser({ onEnterCity, reduced, audioEnabled, onToggleAudio }: Te
             </div>
 
             <footer className="teaser-footer">
-              <span>AIRS · ARTIFICIAL INTELLIGENCE & TECHNOLOGY</span>
+              <span>AIRS · ARTIFICIAL INTELLIGENCE RESEARCH SOCIETY</span>
               <span>5 DISTRICTS · CONTINUOUS AUDIO · FREE EXPLORATION</span>
             </footer>
           </div>
@@ -320,11 +378,12 @@ export function Teaser({ onEnterCity, reduced, audioEnabled, onToggleAudio }: Te
 
       {/* ── Progress Indicators at Bottom ────────────────────────────── */}
       <div className="teaser-progress-bar" aria-hidden="true">
-        {[0, 1, 2, 3, 4, 5, 6].map(step => (
+        {[0, 1, 2, 3, 4, 5, 6, 7].map(step => (
           <span
             key={step}
             className={`progress-pip ${phase >= step ? 'filled' : ''} ${phase === step ? 'active' : ''}`}
             onClick={() => setPhase(step)}
+            title={`Phase ${step + 1}`}
           />
         ))}
       </div>
