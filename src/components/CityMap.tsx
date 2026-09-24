@@ -439,7 +439,6 @@ export function CityMap({ state, dispatch, reduced, travel, onReady, airsLinkOpe
           {districts.map(d => <button key={d.id} className={`waypoint ${state.selected === d.id ? 'selected' : ''} ${state.discovered.includes(d.id) ? 'discovered' : ''} waypoint--${d.position.x > 0.6 ? 'east' : 'west'}`} style={{ left: `${d.position.x * 100}%`, top: `${d.position.y * 100}%`, '--accent': d.accent } as CSSProperties}
             aria-label={`Navigate to ${d.name}. Sector ${d.sector}. ${state.discovered.includes(d.id) ? 'Discovered' : 'Unexplored'}.`}
             aria-pressed={state.selected === d.id} onFocus={() => focusWaypoint(d.id)}
-            onMouseEnter={() => { if (matchMedia('(hover: hover)').matches) dispatch({ type: 'SELECT', id: d.id }); }}
             onClick={() => { focusWaypoint(d.id); travel(d.id); }}
             onKeyDown={e => {
               if (e.key === 'Enter' || e.key === ' ') {
