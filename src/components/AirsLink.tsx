@@ -361,7 +361,7 @@ function AirsIdApp({ state }: { state: WorldState }) {
           <AirsMark />
         </div>
         <div className="al-id-heading">
-          <span className="al-eyebrow-label">AIRS LINK Identity</span>
+          <span className="al-eyebrow-label">AIRS IRIS Identity</span>
           <div className="al-id-role">Explorer / City Network</div>
         </div>
       </div>
@@ -1070,12 +1070,12 @@ export function AirsLink({ state, travel, onClose, reduced, audioEnabled, onTogg
         ref={deviceRef}
         role="dialog"
         aria-modal="true"
-        aria-label="AIRS LINK"
+        aria-label="AIRS IRIS"
         tabIndex={-1}
       >
         {/* ── Status bar ──────────────────────────────────────── */}
         <div className="al-statusbar">
-          <span className="al-sb-brand" aria-hidden="true">AIRS<span>·</span>LINK</span>
+          <span className="al-sb-brand" aria-hidden="true">AIRS<span>·</span>IRIS</span>
           <span className="al-sb-time" aria-hidden="true">{hh}:{mm}</span>
           <div className="al-sb-right">
             <button
@@ -1100,7 +1100,7 @@ export function AirsLink({ state, travel, onClose, reduced, audioEnabled, onTogg
 
         {/* ── Screen content ──────────────────────────────────── */}
         <div className="al-screen">
-          <button className="al-close-btn" onClick={handleClose} aria-label="Close AIRS LINK">
+          <button className="al-close-btn" onClick={handleClose} aria-label="Close AIRS IRIS">
             <Icon name="close" size={14}/>
           </button>
 
@@ -1119,7 +1119,7 @@ export function AirsLink({ state, travel, onClose, reduced, audioEnabled, onTogg
         </div>
 
         {/* ── Dock ────────────────────────────────────────────── */}
-        <nav className="al-dock" aria-label="AIRS LINK apps">
+        <nav className="al-dock" aria-label="AIRS IRIS apps">
           {dock.map(item => (
             <button
               key={item.id}

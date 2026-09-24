@@ -298,7 +298,7 @@ export function Teaser({ onEnterCity, reduced, audioEnabled, onToggleAudio }: Te
           <div className="teaser-scene scene-link" key="scene-link">
             <div className="teaser-device-silhouette">
               <div className="device-header">
-                <span>AIRS · LINK</span>
+                <span>AIRS · IRIS</span>
                 <span className="device-indicator" />
               </div>
               <div className="device-screen-glimpse">
@@ -325,7 +325,7 @@ export function Teaser({ onEnterCity, reduced, audioEnabled, onToggleAudio }: Te
             </div>
             <div className="teaser-device-copy">
               <span className="eyebrow">PORTABLE OPERATING SYSTEM</span>
-              <h3>AIRS LINK</h3>
+              <h3>AIRS IRIS</h3>
               <p>The handheld interface to decode, inspect, and navigate the city.</p>
             </div>
           </div>

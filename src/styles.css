@@ -1555,7 +1555,7 @@ button:focus:not(:focus-visible),[tabindex='-1']:focus{outline:none}
   }
   .al-trigger{
     right:16px;
-    bottom:calc(56px + env(safe-area-inset-bottom,0px));
+    bottom:calc(138px + env(safe-area-inset-bottom,0px));
   }
 }
 

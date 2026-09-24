@@ -109,7 +109,7 @@ export function App() {
   derivedIntel.push({
     id: 'sys-active',
     category: 'SYSTEM',
-    title: 'AIRS LINK CONNECTION ACTIVE',
+    title: 'AIRS IRIS CONNECTION ACTIVE',
     message: 'Local network synchronization complete.',
     type: 'info'
   });

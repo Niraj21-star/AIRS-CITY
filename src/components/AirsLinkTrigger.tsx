@@ -5,12 +5,12 @@ export function AirsLinkTrigger({ onClick, unreadCount }: { onClick: () => void;
     <button
       className="al-trigger"
       onClick={onClick}
-      aria-label={`Open AIRS LINK${unreadCount > 0 ? `, ${unreadCount} areas uncharted` : ''}`}
+      aria-label={`Open AIRS IRIS${unreadCount > 0 ? `, ${unreadCount} areas uncharted` : ''}`}
     >
       <span className="al-trigger-icon" aria-hidden="true">
         <AirsMark />
       </span>
-      <span className="al-trigger-label">LINK</span>
+      <span className="al-trigger-label">IRIS</span>
       {unreadCount > 0 && (
         <span className="al-trigger-pip" aria-hidden="true" />
       )}
