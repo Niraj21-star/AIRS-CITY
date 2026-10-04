@@ -12,9 +12,10 @@ interface TeaserProps {
   reduced: boolean;
   audioEnabled: boolean;
   onToggleAudio: () => void;
+  onOpenAirsLink?: (app: 'events' | 'home') => void;
 }
 
-export function Teaser({ onEnterCity, reduced, audioEnabled, onToggleAudio }: TeaserProps) {
+export function Teaser({ onEnterCity, reduced, audioEnabled, onToggleAudio, onOpenAirsLink }: TeaserProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [phase, setPhase] = useState<number>(0);
   const [hasStartedAudio, setHasStartedAudio] = useState(false);
@@ -341,10 +342,13 @@ export function Teaser({ onEnterCity, reduced, audioEnabled, onToggleAudio }: Te
                 YOU DON'T BROWSE IT.<br />
                 <span>YOU EXPLORE IT.</span>
               </h1>
-              <p className="climax-sub">
-                A LIVING DIGITAL WORLD.<br />
-                <strong>STEP INSIDE AIRS CITY.</strong>
-              </p>
+              
+              <div style={{ background: 'rgba(255,0,60,0.1)', border: '1px solid #ff003c', padding: '16px', borderRadius: '8px', margin: '24px 0', textAlign: 'center' }}>
+                <p style={{ margin: 0, color: '#ff003c', fontSize: '12px', fontWeight: 'bold', letterSpacing: '0.1em' }}>🚨 EARLY BIRD ENDS TODAY @ 8PM 🚨</p>
+                <h2 style={{ margin: '8px 0', fontSize: '24px' }}>VORTEXA 3.0 HACKATHON</h2>
+                <p style={{ margin: '0 0 12px 0', fontSize: '14px', opacity: 0.9 }}>11-12 October • ₹500/team • Win up to ₹1,00,000</p>
+                <button type="button" onClick={() => { onOpenAirsLink?.('events'); onEnterCity(); }} style={{ display: 'inline-block', background: '#ff003c', color: 'white', padding: '8px 24px', border: 'none', cursor: 'pointer', fontWeight: 'bold', borderRadius: '4px', fontSize: '14px' }}>VIEW FULL DETAILS & REGISTER</button>
+              </div>
 
               <div className="climax-actions">
                 <button
