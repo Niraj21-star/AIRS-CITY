@@ -171,9 +171,10 @@ type Props = {
   travel: (id: DistrictId) => void;
   onReady: () => void;
   airsLinkOpen?: boolean;
+  onOpenAirsLink?: (app: 'events' | 'home') => void;
 };
 
-export function CityMap({ state, dispatch, reduced, travel, onReady, airsLinkOpen }: Props) {
+export function CityMap({ state, dispatch, reduced, travel, onReady, airsLinkOpen, onOpenAirsLink }: Props) {
   const viewport = useRef<HTMLDivElement>(null);
   const world = useRef<HTMLDivElement>(null);
   const camera = useRef<Camera>({ x: 0, y: 0, scale: 1 });
@@ -472,7 +473,17 @@ export function CityMap({ state, dispatch, reduced, travel, onReady, airsLinkOpe
     <div className="compass" aria-hidden="true"><span>N</span><svg width="52" height="52" viewBox="0 0 52 52"><circle cx="26" cy="26" r="22" fill="none" stroke="currentColor" opacity=".25"/><path d="m26 11 5 20-5-3-5 3z" fill="currentColor"/><path d="M26 4v4m22 18h-4M26 48v-4M4 26h4" stroke="currentColor"/></svg><small>SECTOR 001</small></div>
     <div className="map-legend" aria-label="Waypoint legend"><span><i className="legend-available"/>Available</span><span><i className="legend-selected"/>Selected</span><span><Icon name="check" size={10}/>Discovered</span></div>
     <div className="map-tools" aria-label="Map camera controls"><button title="Zoom in" aria-label="Zoom in" disabled={zoom >= 2.2} onClick={() => changeZoom(1)}><Icon name="plus"/></button><span>{zoom.toFixed(1)}x</span><button title="Zoom out" aria-label="Zoom out" disabled={zoom <= 1} onClick={() => changeZoom(-1)}><Icon name="minus"/></button><button title="Reset map view" aria-label="Reset map view" onClick={() => animateCamera(overview())}><Icon name="target"/></button></div>
-    <div className="city-editorial"><p className="eyebrow"><span className="short-rule"/> World map / Free exploration</p><h1>AIRS CITY<span>.</span></h1><p className="city-tagline">You don't browse. You explore.</p></div>
+    <div className="city-editorial">
+      <div style={{ background: 'rgba(255,0,60,0.15)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)', color: 'white', padding: '16px', borderRadius: '8px', marginBottom: '24px', border: '1px solid rgba(255,0,60,0.5)', borderLeft: '4px solid #ff003c', pointerEvents: 'auto' }}>
+        <p style={{ margin: 0, fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#ff4d79', fontWeight: 'bold' }}>🚨 Early Bird Ends Today (8:00 PM) 🚨</p>
+        <h2 style={{ margin: '6px 0', fontSize: '24px', letterSpacing: '0.02em', textShadow: '0 0 10px rgba(255,0,60,0.5)' }}>VORTEXA 3.0</h2>
+        <p style={{ margin: '0 0 12px 0', fontSize: '13px', lineHeight: '1.4', opacity: 0.9 }}>12-Hour Hackathon • 11-12 Oct • ₹500/team<br/>Sponsor: <strong>ElevenLabs</strong> (1 mo. FREE Creator access for all!)</p>
+        <button type="button" onClick={() => onOpenAirsLink?.('events')} style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: '#ff003c', color: 'white', padding: '8px 16px', textDecoration: 'none', fontSize: '12px', fontWeight: 'bold', borderRadius: '4px', textTransform: 'uppercase', border: 'none', cursor: 'pointer' }}>View Details & Register <Icon name="arrow" size={12} /></button>
+      </div>
+      <p className="eyebrow"><span className="short-rule"/> World map / Free exploration</p>
+      <h1>AIRS CITY<span>.</span></h1>
+      <p className="city-tagline">You don't browse. You explore.</p>
+    </div>
     <nav className="mobile-districts" aria-label="Select a district">{districts.map(d => <button key={d.id} aria-label={`Navigate to ${d.name}`} aria-pressed={state.selected === d.id} className={state.selected === d.id ? 'active' : ''} style={{ '--accent': d.accent } as CSSProperties} onClick={() => { focusWaypoint(d.id); travel(d.id); }}><Icon name={d.id}/><span>{d.id === 'research' ? 'Research' : d.id === 'garage' ? 'Garage' : d.id === 'arena' ? 'Arena' : d.id === 'crew' ? 'Crew' : 'HQ'}</span></button>)}</nav>
   </section>;
 }

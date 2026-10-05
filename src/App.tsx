@@ -88,10 +88,10 @@ export function App() {
   };
   // ── AIRS LINK device state (UI only — not in world.ts) ────────────────────
   const [airsLinkOpen, setAirsLinkOpen] = useState(false);
-  const [, setAirsLinkApp] = useState<AirsLinkAppId>('home');
+  const [airsLinkApp, setAirsLinkApp] = useState<AirsLinkAppId>('home');
   const [readIntel, setReadIntel] = useState<Set<string>>(new Set());
 
-  const openAirsLink = () => { setAirsLinkApp('home'); setAirsLinkOpen(true); };
+  const openAirsLink = (app: AirsLinkAppId = 'home') => { setAirsLinkApp(app); setAirsLinkOpen(true); };
   const closeAirsLink = () => setAirsLinkOpen(false);
   const markIntelRead = (id: string) => {
     setReadIntel(prev => {
@@ -159,6 +159,16 @@ export function App() {
       type: 'info'
     });
   }
+
+  // EVENT INTEL
+  derivedIntel.push({
+    id: 'event-vortexa',
+    category: 'EVENT',
+    title: 'VORTEXA 3.0 HACKATHON OPEN',
+    message: 'Early Bird ends today at 8:00 PM. Win up to ₹1,00,000.',
+    districtId: 'arena',
+    type: 'warning'
+  });
 
   // Current Location
   if (state.district) {
@@ -329,6 +339,7 @@ export function App() {
           reduced={reduced}
           audioEnabled={state.audioEnabled}
           onToggleAudio={toggleAudio}
+          onOpenAirsLink={openAirsLink}
         />
       </Suspense>
     );
@@ -343,7 +354,7 @@ export function App() {
         <div className="header-right"><span className="city-status"><span className="status-dot"/>{district ? district.sector + ' / ONLINE' : 'CITY ONLINE'}</span><span className="header-coordinate">AC / 001</span><button className={`audio-toggle ${state.audioEnabled ? 'enabled' : ''}`} onClick={toggleAudio} aria-label={state.audioEnabled ? 'Mute ambient audio' : 'Enable quiet ambient audio'} aria-pressed={state.audioEnabled}><span className="audio-bars"><i/><i/><i/><i/></span><span>Sound {state.audioEnabled ? 'on' : 'off'}</span></button><button className="icon-button guide-button" onClick={() => setOverlay('guide')} aria-label="Open controls and city guide"><Icon name="help" size={19}/></button></div>
       </header>
       <main id="main-world" aria-busy={state.isTransitioning}>
-        <CityMap state={state} dispatch={dispatch} reduced={reduced} travel={travel} onReady={() => setAssetReady(true)} airsLinkOpen={airsLinkOpen}/>
+        <CityMap state={state} dispatch={dispatch} reduced={reduced} travel={travel} onReady={() => setAssetReady(true)} airsLinkOpen={airsLinkOpen} onOpenAirsLink={openAirsLink} />
         {district && <div key={district.id} className={`district-layer ${state.isTransitioning ? 'departing' : ''}`} inert={state.isTransitioning}><DistrictScene id={district.id} begin={() => dispatch({ type: 'OPEN_CONTENT' })} returnToCity={() => travel('city')} reduced={reduced} originComplete={state.originComplete} discovered={state.discovered}/></div>}
       </main>
       <footer className="world-footer"><div className="discovery-counter"><span className="discovery-bars">{districts.map(d => <i key={d.id} className={state.discovered.includes(d.id) ? 'filled' : ''}/>)}</span><span><strong>{String(state.discovered.length).padStart(2, '0')}</strong> / 05 <span className="discovered-word">DISTRICTS DISCOVERED</span></span></div><span className="map-instructions">{state.level === 'CITY' ? 'DRAG TO EXPLORE' : 'FOLLOW YOUR CURIOSITY'}<span>+</span>{state.level === 'CITY' ? 'SELECT A WAYPOINT' : 'ESC TO RETURN'}</span><button className="index-button" id="district-index" onClick={() => setOverlay('index')} disabled={state.isTransitioning}><Icon name="map" size={16}/>District index<span className="key-hint">05</span></button></footer>
@@ -391,6 +402,7 @@ export function App() {
           intel={derivedIntel}
           readIntel={readIntel}
           markIntelRead={markIntelRead}
+          initialApp={airsLinkApp}
         />
       </Suspense>
     )}

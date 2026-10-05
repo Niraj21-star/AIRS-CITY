@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import gsap from 'gsap';
 import { byId, districts, researchDomains, type DistrictId } from '../data/districts';
 import { airsProjects, categoryLabels, type ProjectCategory } from '../data/projects';
-import type { EventCategory } from '../data/events';
+import { airsEvents, type EventCategory } from '../data/events';
 import type { WorldState } from '../store/world';
 import { AirsMark, Icon } from './Icon';
 import { audio } from '../audio';
@@ -37,6 +37,7 @@ interface Props {
   intel: IntelItem[];
   readIntel: Set<string>;
   markIntelRead: (id: string) => void;
+  initialApp?: AirsLinkAppId;
 }
 
 // ── Mission status derivation ─────────────────────────────────────────────────
@@ -911,6 +912,8 @@ function EventsApp() {
     { id: 'past', label: 'Past' },
   ];
 
+  const filteredEvents = airsEvents.filter(e => e.category === activeTab || (activeTab === 'hackathons' && e.tags?.includes('Hackathon')));
+
   return (
     <div className="al-app al-app-events">
       {/* Section tabs */}
@@ -928,11 +931,48 @@ function EventsApp() {
         ))}
       </div>
 
-      {/* Honest empty state for all categories (No data in repo) */}
-      <div className="al-empty-state al-empty-state-lg">
-        <span className="al-empty-code">EVENT ARCHIVE</span>
-        <span className="al-empty-msg">No verified entries</span>
-        <span className="al-empty-sub">No registered event records are currently available.</span>
+      <div className="al-project-list" style={{ marginTop: '16px', overflowY: 'auto', paddingBottom: '32px' }}>
+        {filteredEvents.length === 0 ? (
+          <div className="al-empty-state al-empty-state-lg">
+            <span className="al-empty-code">EVENT ARCHIVE</span>
+            <span className="al-empty-msg">No verified entries</span>
+            <span className="al-empty-sub">No registered event records are currently available.</span>
+          </div>
+        ) : (
+          filteredEvents.map(event => (
+            <div key={event.id} className="al-project-card" style={{ '--da': '#ff2a4f', borderLeft: '2px solid var(--da)' } as CSSProperties}>
+              <div className="al-pc-header">
+                <span className="al-pc-id">{event.date} • {event.time}</span>
+                <span className="al-pc-status s-active">{event.status}</span>
+              </div>
+              <div className="al-pc-name" style={{ marginTop: '8px' }}>{event.title.toUpperCase()}</div>
+              <div className="al-pc-category" style={{ color: 'var(--da)', marginBottom: '8px' }}>{event.venue}</div>
+              <p className="al-pc-desc" style={{ whiteSpace: 'pre-line' }}>{event.description}</p>
+              
+              {event.tags && (
+                <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '12px' }}>
+                  {event.tags.map(tag => (
+                    <span key={tag} style={{ fontSize: '9px', textTransform: 'uppercase', letterSpacing: '0.05em', background: 'rgba(255,255,255,0.06)', padding: '4px 6px', borderRadius: '2px' }}>{tag}</span>
+                  ))}
+                </div>
+              )}
+              
+              {event.registrationUrl && (
+                <div className="al-pc-footer" style={{ marginTop: '16px', paddingTop: '16px', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+                  <a 
+                    href={event.registrationUrl} 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="primary-action"
+                    style={{ textDecoration: 'none', width: '100%', justifyContent: 'center' }}
+                  >
+                    REGISTER FOR EARLY BIRD <Icon name="arrow" size={12} />
+                  </a>
+                </div>
+              )}
+            </div>
+          ))
+        )}
       </div>
     </div>
   );
@@ -940,11 +980,11 @@ function EventsApp() {
 
 
 // ── Device shell ──────────────────────────────────────────────────────────────
-export function AirsLink({ state, travel, onClose, reduced, audioEnabled, onToggleAudio, intel, readIntel, markIntelRead }: Props) {
+export function AirsLink({ state, travel, onClose, reduced, audioEnabled, onToggleAudio, intel, readIntel, markIntelRead, initialApp = 'home' }: Props) {
   const deviceRef     = useRef<HTMLDivElement>(null);
   const backdropRef   = useRef<HTMLDivElement>(null);
   const previousFocus = useRef<HTMLElement | null>(null);
-  const [activeApp, setActiveApp] = useState<AirsLinkAppId>('home');
+  const [activeApp, setActiveApp] = useState<AirsLinkAppId>(initialApp);
   const [time, setTime]           = useState(() => new Date());
 
   const handleToggleAudio = () => {

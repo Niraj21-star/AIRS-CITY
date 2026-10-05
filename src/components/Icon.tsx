@@ -1,4 +1,5 @@
 import type { DistrictId } from '../data/districts';
+import logoUrl from '../assets/logo.jpeg';
 
 export type IconName = DistrictId | 'arrow' | 'close' | 'sound' | 'mute' | 'map' | 'plus' | 'minus' | 'target' | 'chevron' | 'check' | 'help' | 'back' | 'expand' | 'play';
 const paths: Record<IconName, React.ReactNode> = {
@@ -26,5 +27,5 @@ export function Icon({ name, size = 20 }: { name: IconName; size?: number }) {
 }
 
 export function AirsMark() {
-  return <svg className="airs-mark" width="39" height="37" viewBox="0 0 42 40" fill="none" aria-hidden="true"><path d="M2 36 19 4h5l17 32H30L21.5 19 13 36H2Z" fill="currentColor"/><path d="M18 29h7v7h-7z" fill="currentColor"/></svg>;
+  return <img src={logoUrl} alt="AIRS Logo" className="airs-mark" style={{ width: 39, height: 39, objectFit: 'cover', borderRadius: '50%', border: '1px solid rgba(255,255,255,0.2)' }} aria-hidden="true" />;
 }
